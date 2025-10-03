@@ -16,7 +16,7 @@ function EditProductContent() {
   const [categories, setCategories] = useState([])
   const [product, setProduct] = useState(null)
   
-  const apiBase = 'http://localhost:8080/api'
+  const apiBase = 'https://snacks-back01.onrender.com/api'
   const productId = searchParams.get('id')
 
   // Helper function to get auth headers

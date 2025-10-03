@@ -86,7 +86,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const orderRes = await fetch(`${'http://localhost:8080/api'}/orders`, {
+      const orderRes = await fetch(`${'https://snacks-back01.onrender.com/api'}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

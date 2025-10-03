@@ -70,7 +70,7 @@ const AdminPage = () => {
   const { addToast } = useToast()
 
   // Memoize API base URL to prevent recreation - MUST be declared before functions that use it
-  const API_BASE_URL = useMemo(() => 'http://localhost:8080/api', [])
+  const API_BASE_URL = useMemo(() => 'https://snacks-back01.onrender.com/api', [])
 
   // Helper function to get auth headers - memoized to prevent recreation
   const getAuthHeaders = useCallback(() => {

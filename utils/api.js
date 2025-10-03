@@ -4,7 +4,7 @@ const getApiUrl = () => {
   if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL
   }
-  return 'http://localhost:8080/api'
+  return 'https://snacks-back01.onrender.com/api'
 }
 
 const buildApiUrl = (endpoint) => {

@@ -13,7 +13,7 @@ const CouponInput = () => {
 
   useEffect(() => {
     // Fetch public available coupons from backend
-    fetch('http://localhost:8080/api/coupons')
+    fetch('https://snacks-back01.onrender.com/api/coupons')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.coupons) {

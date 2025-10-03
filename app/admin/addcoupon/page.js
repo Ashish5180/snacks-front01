@@ -42,7 +42,7 @@ export default function AddCouponPage() {
 
   useEffect(() => {
     // Fetch categories from backend
-    fetch("http://localhost:8080/api/products/categories")
+    fetch("https://snacks-back01.onrender.com/api/products/categories")
       .then(res => res.json())
       .then(data => {
         setCategories(data.data.categories || []);
@@ -91,7 +91,7 @@ export default function AddCouponPage() {
         applicableUsers: form.applicableUsers ? form.applicableUsers.split(',').map(u => u.trim()) : [],
         excludedUsers: form.excludedUsers ? form.excludedUsers.split(',').map(u => u.trim()) : []
       };
-      const res = await fetch("http://localhost:8080/api/coupons", {
+      const res = await fetch("https://snacks-back01.onrender.com/api/coupons", {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(payload)

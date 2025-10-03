@@ -160,7 +160,7 @@ export default function ProductDetailPage() {
       setError(null)
       
       try {
-        const response = await fetch(`http://localhost:8080/api/products/${params.id}`, {
+        const response = await fetch(`https://snacks-back01.onrender.com/api/products/${params.id}`, {
           headers: { 'Cache-Control': 'no-cache' }
         })
         
