@@ -250,7 +250,7 @@ const CreateProductPage = () => {
   const validateClient = () => {
     const errors = []
     if (!form.name.trim()) errors.push('Name required')
-    if (form.description.trim().length < 10) errors.push('Description min 10 chars')
+    // Allow empty/short descriptions
     if (!form.image.trim()) errors.push('Main image required')
     if (!form.ingredients.trim()) errors.push('Ingredients required')
     form.sizes.forEach((s, i) => {
