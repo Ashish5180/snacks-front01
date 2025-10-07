@@ -59,7 +59,12 @@ const CategorySection = () => {
         const res = await fetch('https://snacks-back01.onrender.com/api/categories');
         if (!res.ok) throw new Error('Failed to fetch categories');
         const data = await res.json();
-        const apiCategories = data.data.categories || [];
+        const apiCategories = (data.data.categories || []).map(cat => {
+          const image = typeof window !== 'undefined' && cat.image && cat.image.startsWith('/uploads/')
+            ? `${window.location.protocol}//${window.location.host}${cat.image}`
+            : cat.image;
+          return { ...cat, image };
+        });
         
         // If API returns categories, use them; otherwise use fallback
         if (apiCategories.length > 0) {

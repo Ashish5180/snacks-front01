@@ -93,8 +93,10 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const fetchShippingSettings = async () => {
       try {
-        const res = await fetch(buildApiUrl('/admin/shipping-fee'), {
-          headers: { 'Content-Type': 'application/json' }
+        const res = await fetch(buildApiUrl(`/admin/shipping-fee?_=${Date.now()}`), {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store'
         })
         if (res.ok) {
           const data = await res.json()

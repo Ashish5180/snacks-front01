@@ -17,6 +17,13 @@ function EditProductContent() {
   const [product, setProduct] = useState(null)
   
   const apiBase = 'https://snacks-back01.onrender.com/api'
+  const getFileUploadHeaders = () => {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return {}
+    }
+    const token = localStorage.getItem('token')
+    return { 'Authorization': `Bearer ${token}` }
+  }
   const productId = searchParams.get('id')
 
   // Helper function to get auth headers
@@ -137,6 +144,29 @@ function EditProductContent() {
     video: ''
   })
 
+  // File upload state for edit
+  const [mainImageFile, setMainImageFile] = useState(null)
+  const [additionalImageFiles, setAdditionalImageFiles] = useState([])
+  const [uploading, setUploading] = useState(false)
+
+  const uploadImageToServer = async (file) => {
+    const fd = new FormData()
+    fd.append('image', file)
+    try {
+      const res = await fetch(`${apiBase}/admin/upload-image`, {
+        method: 'POST',
+        headers: getFileUploadHeaders(),
+        body: fd
+      })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      if (data.success && data.data?.imageUrl) return data.data.imageUrl
+      throw new Error(data.message || 'Upload failed')
+    } catch (e) {
+      throw e
+    }
+  }
+
   // Update form when product data is loaded
   useEffect(() => {
     if (product) {
@@ -212,6 +242,44 @@ function EditProductContent() {
         ...prev,
         images: prev.images.filter((_, i) => i !== index)
       }))
+    }
+  }
+
+  // Handlers: upload main image file
+  const handleMainImageUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) { addToast('Invalid image file', 'error'); return }
+    if (file.size > 5 * 1024 * 1024) { addToast('Max 5MB image size', 'error'); return }
+    try {
+      setUploading(true)
+      const url = await uploadImageToServer(file)
+      setMainImageFile(file)
+      updateField('image', url)
+      addToast('Main image uploaded', 'success')
+    } catch (err) {
+      addToast(err.message || 'Upload failed', 'error')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Handlers: upload additional image file
+  const handleAdditionalImageUpload = async (e, index) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) { addToast('Invalid image file', 'error'); return }
+    if (file.size > 5 * 1024 * 1024) { addToast('Max 5MB image size', 'error'); return }
+    try {
+      setUploading(true)
+      const url = await uploadImageToServer(file)
+      setAdditionalImageFiles(prev => { const c = [...prev]; c[index] = file; return c })
+      updateImage(index, url)
+      addToast('Image uploaded', 'success')
+    } catch (err) {
+      addToast(err.message || 'Upload failed', 'error')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -382,15 +450,28 @@ function EditProductContent() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-vibe-brown mb-2">Main Image URL *</label>
-                <input
-                  type="url"
-                  value={form.image}
-                  onChange={(e) => updateField('image', e.target.value)}
-                  className="w-full px-3 py-2 border border-vibe-cookie rounded-md focus:outline-none focus:ring-2 focus:ring-vibe-cookie"
-                  placeholder="https://example.com/image.jpg"
-                  required
-                />
+                <label className="block text-sm font-medium text-vibe-brown mb-2">Main Image *</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <input id="edit-main-image" type="file" accept="image/*" className="hidden" onChange={handleMainImageUpload} disabled={uploading} />
+                    <label htmlFor="edit-main-image" className={`px-3 py-2 border-2 border-dashed rounded-md cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>Upload from device</label>
+                    {mainImageFile && (
+                      <span className="text-sm text-vibe-brown/70">{mainImageFile.name}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-vibe-brown/70">OR</span>
+                    <input
+                      type="url"
+                      value={mainImageFile ? '' : form.image}
+                      onChange={(e) => updateField('image', e.target.value)}
+                      className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md focus:outline-none focus:ring-2 focus:ring-vibe-cookie"
+                      placeholder="https://example.com/image.jpg"
+                      disabled={!!mainImageFile}
+                      required
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="md:col-span-2">
@@ -432,28 +513,38 @@ function EditProductContent() {
               </button>
             </div>
             
-            <div className="space-y-3">
-              {form.images.map((image, index) => (
-                <div key={index} className="flex gap-3">
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => updateImage(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md focus:outline-none focus:ring-2 focus:ring-vibe-cookie"
-                    placeholder={`Additional image URL ${index + 1}`}
-                  />
-                  {form.images.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
+                <div className="space-y-3">
+                  {form.images.map((image, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <input id={`edit-add-image-${index}`} type="file" accept="image/*" className="hidden" onChange={(e)=>handleAdditionalImageUpload(e, index)} disabled={uploading} />
+                        <label htmlFor={`edit-add-image-${index}`} className={`px-3 py-2 border-2 border-dashed rounded-md cursor-pointer text-sm ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>Upload from device</label>
+                        {additionalImageFiles[index] && (
+                          <span className="text-xs text-vibe-brown/70">{additionalImageFiles[index].name}</span>
+                        )}
+                      </div>
+                      <div className="flex gap-3">
+                        <input
+                          type="url"
+                          value={additionalImageFiles[index] ? '' : image}
+                          onChange={(e) => updateImage(index, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md focus:outline-none focus:ring-2 focus:ring-vibe-cookie"
+                          placeholder={`Additional image URL ${index + 1}`}
+                          disabled={!!additionalImageFiles[index]}
+                        />
+                        {form.images.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
           </div>
 
           {/* Sizes and Pricing */}

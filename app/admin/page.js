@@ -63,6 +63,8 @@ const AdminPage = () => {
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(null)
   const [freeShippingThresholdInput, setFreeShippingThresholdInput] = useState('')
   const [isShippingFeeLoading, setIsShippingFeeLoading] = useState(false)
+  const [bannerUploading, setBannerUploading] = useState(false)
+  const [bannerUrls, setBannerUrls] = useState(['', '', ''])
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   
@@ -88,8 +90,9 @@ const AdminPage = () => {
   const fetchShippingSettings = useCallback(async () => {
     setIsShippingFeeLoading(true)
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/shipping-fee`, {
-        headers: getAuthHeaders()
+      const response = await fetch(`${API_BASE_URL}/admin/shipping-fee?_=${Date.now()}`, {
+        headers: getAuthHeaders(),
+        cache: 'no-store'
       })
       if (response.ok) {
         const data = await response.json()
@@ -124,6 +127,8 @@ const AdminPage = () => {
         setShippingFee(data.shippingFee)
         setFreeShippingThreshold(data.freeShippingThreshold)
         addToast('Shipping settings updated', 'success')
+        // Refetch to ensure no cache and UI sync
+        fetchShippingSettings()
       } else {
         addToast('Failed to update shipping settings', 'error')
       }
@@ -131,6 +136,38 @@ const AdminPage = () => {
       addToast('Error updating shipping settings', 'error')
     } finally {
       setIsShippingFeeLoading(false)
+    }
+  }
+
+  // Banner upload helper
+  const uploadBanner = async (file, index) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) { addToast('Please select an image file', 'error'); return }
+    if (file.size > 5 * 1024 * 1024) { addToast('Max 5MB image size', 'error'); return }
+    setBannerUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('image', file)
+      const response = await fetch(`${API_BASE_URL}/uploads/banner`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: fd
+      })
+      const data = await response.json()
+      if (response.ok && data.success) {
+        setBannerUrls(prev => {
+          const c = [...prev];
+          c[index] = data.data.imageUrl;
+          return c;
+        })
+        addToast('Banner uploaded', 'success')
+      } else {
+        addToast(data.message || 'Upload failed', 'error')
+      }
+    } catch (e) {
+      addToast('Upload error', 'error')
+    } finally {
+      setBannerUploading(false)
     }
   }
 
@@ -685,6 +722,25 @@ Verified: ${review.verified ? 'Yes' : 'No'}
                   <strong>How it works:</strong> Customers will be charged ₹{shippingFee !== null ? shippingFee : '...'} for shipping on orders below ₹{freeShippingThreshold !== null ? freeShippingThreshold : '...'}. Orders above this amount get free shipping.
                 </p>
               </div>
+            </div>
+
+            {/* Banner Uploads */}
+            <div className="bg-white rounded-lg shadow-sm border border-vibe-cookie p-6">
+              <h3 className="text-lg font-semibold text-vibe-brown mb-4">Homepage Banners</h3>
+              <p className="text-sm text-vibe-brown/70 mb-4">Upload up to 3 banner images. Copy the URLs and paste them into <code>components/HeroCarousel.js</code> slides.</p>
+              {[0,1,2].map((i) => (
+                <div key={i} className="mb-4">
+                  <label className="block text-sm font-medium text-vibe-brown mb-2">Banner #{i+1}</label>
+                  <div className="flex items-center gap-3">
+                    <input id={`banner-upload-${i}`} type="file" accept="image/*" className="hidden" onChange={(e)=>uploadBanner(e.target.files?.[0], i)} disabled={bannerUploading} />
+                    <label htmlFor={`banner-upload-${i}`} className={`px-4 py-2 border-2 border-dashed rounded-md cursor-pointer ${bannerUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{bannerUploading ? 'Uploading...' : 'Upload image'}</label>
+                    <input type="text" value={bannerUrls[i]} readOnly className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md text-sm" placeholder="Image URL will appear here after upload" />
+                    {bannerUrls[i] && (
+                      <a href={bannerUrls[i]} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">View</a>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
