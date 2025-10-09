@@ -89,7 +89,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <div className="relative w-36 h-14 sm:w-44 sm:h-16 md:w-52 md:h-20 transition-all duration-200">
+              <div className="relative w-24 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16 transition-all duration-200">
                 <Image
                   src="/images/logo.jpeg"
                   alt="VIBE BITES"
@@ -98,7 +98,7 @@ const Navbar = () => {
                   priority
                 />
               </div>
-              <span className="ml-2 text-vibe-brown font-bold text-lg sm:text-xl md:text-2xl hidden sm:block whitespace-nowrap">
+              <span className="ml-2 text-vibe-brown font-bold text-sm sm:text-lg md:text-xl hidden sm:block whitespace-nowrap">
                 VIBE BITES
               </span>
             </Link>
