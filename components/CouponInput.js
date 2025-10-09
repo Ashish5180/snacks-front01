@@ -63,7 +63,7 @@ const CouponInput = () => {
           </button>
         </div>
       ) : (
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
             placeholder="Enter coupon code"
@@ -74,7 +74,7 @@ const CouponInput = () => {
           />
           <button
             onClick={handleApplyCoupon}
-            className="px-4 py-2 bg-vibe-cookie text-vibe-brown rounded-lg hover:bg-vibe-accent transition-colors font-medium"
+            className="px-4 py-2 bg-vibe-cookie text-vibe-brown rounded-lg hover:bg-vibe-accent transition-colors font-medium whitespace-nowrap"
           >
             Apply
           </button>

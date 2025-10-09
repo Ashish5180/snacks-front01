@@ -41,21 +41,22 @@ const HeroCarousel = () => {
         infiniteLoop
         showThumbs={false}
         showStatus={false}
-        interval={4000}
+        interval={2500}
         swipeable
         emulateTouch
+        className="w-full"
       >
         {slides.map((slide) => (
           <div key={slide.id} className="relative h-[500px] w-full">
             <Image
-              src={slide.image}  // <-- Use slide.image here
+              src={slide.image}
               alt={slide.title}
               fill
               style={{ objectFit: 'cover', filter: 'brightness(0.5)' }}
               priority={slide.id === 1}
+              className="w-full h-full"
             />
-          <div className="absolute inset-0  bg-opacity-30 flex flex-col items-center justify-center text-center text-white px-4">
-
+            <div className="absolute inset-0 bg-opacity-30 flex flex-col items-center justify-center text-center text-white px-4">
               <h2 className="text-3xl md:text-5xl font-bold mb-4">{slide.title}</h2>
               <p className="text-lg md:text-xl mb-6">{slide.subtitle}</p>
               <Link href={slide.link}>

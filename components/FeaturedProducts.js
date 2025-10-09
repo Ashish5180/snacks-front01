@@ -51,7 +51,7 @@ const ProductCard = ({ product }) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
       {/* Product Image */}
-      <div className="relative h-64 overflow-hidden">
+      <Link href={`/product/${product._id || product.id}`} className="relative h-64 overflow-hidden block">
         <Image
           src={product.image}
           alt={product.name}
@@ -76,7 +76,7 @@ const ProductCard = ({ product }) => {
             Featured
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Product Info */}
       <div className="p-6">
@@ -86,9 +86,11 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
         
-        <h3 className="text-lg font-semibold text-vibe-brown mb-2">
-          {product.name}
-        </h3>
+        <Link href={`/product/${product._id || product.id}`}>
+          <h3 className="text-lg font-semibold text-vibe-brown mb-2 hover:text-vibe-cookie transition-colors cursor-pointer">
+            {product.name}
+          </h3>
+        </Link>
         
         <p className="text-sm text-vibe-brown/70 mb-4 line-clamp-2">
           {product.description}

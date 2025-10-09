@@ -207,6 +207,14 @@ export const CartProvider = ({ children }) => {
           // General discount
           discount = (subtotal * state.appliedCoupon.discount) / 100
         }
+      } else if (state.appliedCoupon.type === 'fixed') {
+        // Fixed amount discount
+        discount = state.appliedCoupon.discount
+      }
+      
+      // Apply max discount limit if specified
+      if (state.appliedCoupon.maxDiscountAmount && discount > state.appliedCoupon.maxDiscountAmount) {
+        discount = state.appliedCoupon.maxDiscountAmount
       }
     }
     // Apply shipping fee based on threshold (only if cart is not empty)
@@ -221,12 +229,13 @@ export const CartProvider = ({ children }) => {
 
   const applyCoupon = async (couponCode) => {
     try {
+      const subtotal = state.items.reduce((total, item) => total + (item.price * item.quantity), 0)
       const res = await fetch(buildApiUrl('/coupons/validate'), {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ 
           code: couponCode, 
-          orderAmount: getCartTotal(),
+          orderAmount: subtotal, // Use subtotal instead of total for validation
           items: state.items 
         })
       });

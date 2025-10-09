@@ -259,18 +259,41 @@ const AddCategoryPage = () => {
 
   const saveEdit = async (id) => {
     try {
-      // Prepare payload - only send non-empty values for optional fields
-      const payload = {
-        name: editValues.name.trim(),
-        ...(editValues.description.trim() && { description: editValues.description.trim() }),
-        ...(editValues.image.trim() && { image: editValues.image.trim() })
+      // Determine if we should use FormData or JSON
+      const hasUploadedFile = editImageFile;
+      
+      let requestOptions;
+      
+      if (hasUploadedFile) {
+        // Use FormData for file upload
+        const formData = new FormData();
+        formData.append('name', editValues.name.trim());
+        if (editValues.description.trim()) {
+          formData.append('description', editValues.description.trim());
+        }
+        formData.append('image', editImageFile);
+        
+        requestOptions = {
+          method: 'PUT',
+          headers: getFileUploadHeaders(),
+          body: formData
+        };
+      } else {
+        // Use JSON for URL-based images or no image
+        const payload = {
+          name: editValues.name.trim(),
+          ...(editValues.description.trim() && { description: editValues.description.trim() }),
+          ...(editValues.image.trim() && { image: editValues.image.trim() })
+        };
+        
+        requestOptions = {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        };
       }
       
-      const res = await fetch(`${apiBase}/categories/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload)
-      })
+      const res = await fetch(`${apiBase}/categories/${id}`, requestOptions)
       const data = await res.json()
       if (res.ok && data.success) {
         addToast('Category updated', 'success')
