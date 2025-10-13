@@ -58,9 +58,10 @@ function FeaturedProductsList() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
       {products.map((product, idx) => (
-        <div
+        <Link 
           key={product._id || product.id}
-          className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+          href={`/product/${product._id || product.id}`}
+          className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col group"
         >
           <div className="relative w-full h-48 sm:h-56 md:h-64">
             <Image
@@ -69,18 +70,17 @@ function FeaturedProductsList() {
               fill
               style={{ objectFit: 'cover' }}
               priority={idx === 0}
+              className="group-hover:scale-105 transition-transform duration-300"
             />
           </div>
           <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-lg sm:text-xl font-semibold mb-2">{product.name}</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 group-hover:text-[#D9A066] transition-colors">{product.name}</h3>
             <p className="text-[#D9A066] font-bold text-xl mb-4">₹{product.sizes && product.sizes.length ? product.sizes[0].price : product.price}</p>
-            <Link href={`/product/${product._id || product.id}`}>
-              <button className="mt-auto w-full bg-[#D9A066] hover:bg-[#c48841] text-white py-2 rounded-md font-semibold transition">
-                Shop Now
-              </button>
-            </Link>
+            <button className="mt-auto w-full bg-[#D9A066] hover:bg-[#c48841] text-white py-2 rounded-md font-semibold transition">
+              Shop Now
+            </button>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

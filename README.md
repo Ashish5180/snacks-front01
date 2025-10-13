@@ -95,7 +95,15 @@ client/
 
 ## 🐛 Recent Fixes
 
-### Complete Product Editing System (Latest)
+### UI/UX Improvements (Latest - January 2025)
+- **Fixed Featured Products Navigation**: Made entire product cards clickable with hover effects and smooth transitions
+- **Improved Carousel Performance**: Reduced carousel display time from 2.5s to 1.5s for better sliding effect
+- **Enhanced Banner Design**: Made homepage banner full-width with multiple image support and better responsive design
+- **Mobile Coupon Button Fix**: Fixed mobile responsiveness for coupon apply button on cart page
+- **Coupon Toast Notifications**: Fixed red toast notifications showing even when coupons are applied successfully
+- **Max Discount Amount**: Fixed maximum discount amount application on cart calculations
+
+### Complete Product Editing System
 - **New Working Edit Product API**: Created completely new `/api/admin/products/edit/:id` endpoints for GET and PUT operations
 - **New Edit Product Page**: Built from scratch with proper authentication, form handling, and error management
 - **Fixed Product Page**: Resolved infinite loop issues and improved error handling for product display

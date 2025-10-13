@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
 
     autoPlayRef.current = setInterval(() => {
       nextImage()
-    }, 4000) // Change image every 4 seconds
+    }, 2000) // Change image every 2 seconds
 
     return () => {
       if (autoPlayRef.current) {

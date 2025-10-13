@@ -23,18 +23,22 @@ const CouponInput = () => {
       .catch(() => setAvailableCoupons([]))
   }, [])
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       addToast('Please enter a coupon code', 'error')
       return
     }
 
-    const result = applyCoupon(couponCode)
-    if (result.success) {
-      addToast(result.message, 'success')
-      setCouponCode('')
-    } else {
-      addToast(result.message, 'error')
+    try {
+      const result = await applyCoupon(couponCode)
+      if (result.success) {
+        addToast(result.message, 'success')
+        setCouponCode('')
+      } else {
+        addToast(result.message, 'error')
+      }
+    } catch (error) {
+      addToast('Failed to apply coupon. Please try again.', 'error')
     }
   }
 
@@ -63,20 +67,20 @@ const CouponInput = () => {
           </button>
         </div>
       ) : (
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col gap-2">
           <input
             type="text"
             placeholder="Enter coupon code"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
-            className="flex-1 px-3 py-2 border border-vibe-cookie/30 rounded-lg text-vibe-brown placeholder-vibe-brown/60 focus:outline-none focus:ring-2 focus:ring-vibe-cookie focus:border-transparent"
+            className="w-full px-3 py-2 border border-vibe-cookie/30 rounded-lg text-vibe-brown placeholder-vibe-brown/60 focus:outline-none focus:ring-2 focus:ring-vibe-cookie focus:border-transparent"
             onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
           />
           <button
             onClick={handleApplyCoupon}
-            className="px-4 py-2 bg-vibe-cookie text-vibe-brown rounded-lg hover:bg-vibe-accent transition-colors font-medium whitespace-nowrap"
+            className="w-full px-4 py-2 bg-vibe-cookie text-vibe-brown rounded-lg hover:bg-vibe-accent transition-colors font-medium"
           >
-            Apply
+            Apply Coupon
           </button>
         </div>
       )}

@@ -213,8 +213,9 @@ export const CartProvider = ({ children }) => {
       }
       
       // Apply max discount limit if specified
-      if (state.appliedCoupon.maxDiscountAmount && discount > state.appliedCoupon.maxDiscountAmount) {
-        discount = state.appliedCoupon.maxDiscountAmount
+      const maxDiscountLimit = state.appliedCoupon.maxDiscount || state.appliedCoupon.maxDiscountAmount
+      if (maxDiscountLimit && maxDiscountLimit !== -1 && discount > maxDiscountLimit) {
+        discount = maxDiscountLimit
       }
     }
     // Apply shipping fee based on threshold (only if cart is not empty)
@@ -245,12 +246,13 @@ export const CartProvider = ({ children }) => {
           type: 'APPLY_COUPON',
           payload: { code: couponCode.toUpperCase(), ...data.data.coupon, discountAmount: data.data.discountAmount }
         });
-        return { success: true, message: `Coupon ${couponCode.toUpperCase()} applied!` }
+        return { success: true, message: `Coupon ${couponCode.toUpperCase()} applied successfully!` }
       } else {
         return { success: false, message: data.message || 'Invalid coupon code' }
       }
-    } catch {
-      return { success: false, message: 'Network error' }
+    } catch (error) {
+      console.error('Coupon apply error:', error)
+      return { success: false, message: 'Network error. Please try again.' }
     }
   }
 
