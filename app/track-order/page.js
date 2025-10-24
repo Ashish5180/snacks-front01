@@ -147,60 +147,6 @@ function TrackOrderContent() {
   }
 
 
-  const handleReviewProduct = async (productId, productName) => {
-    const rating = prompt(`Please rate ${productName} (1-5 stars):\n1 = Poor\n2 = Fair\n3 = Good\n4 = Very Good\n5 = Excellent\n\nEnter a number (1-5):`)
-    
-    if (!rating || !['1', '2', '3', '4', '5'].includes(rating)) {
-      addToast('Please enter a valid rating (1-5)', 'error')
-      return
-    }
-
-    const title = prompt('Please enter a review title (5-100 characters):')
-    if (!title || title.length < 5 || title.length > 100) {
-      addToast('Please enter a valid title (5-100 characters)', 'error')
-      return
-    }
-
-    const comment = prompt('Please write your review (10-500 characters):')
-    if (!comment || comment.length < 10 || comment.length > 500) {
-      addToast('Please enter a valid review (10-500 characters)', 'error')
-      return
-    }
-
-    try {
-      if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-        addToast('Please login to submit review', 'error')
-        return
-      }
-      
-      const token = localStorage.getItem('token')
-      const response = await fetch(`${getApiUrl()}/reviews/order/${orderData.order._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          productId,
-          rating: parseInt(rating),
-          title,
-          comment
-        })
-      })
-
-      if (response.ok) {
-        addToast('Review submitted successfully! Thank you for your feedback.', 'success')
-        // Refresh order data
-        handleTrackOrder({ preventDefault: () => {} })
-      } else {
-        const data = await response.json()
-        addToast(data.message || 'Error submitting review', 'error')
-      }
-    } catch (error) {
-      console.error('Review submission error:', error)
-      addToast('Error submitting review', 'error')
-    }
-  }
 
   return (
     <div className="min-h-screen bg-vibe-bg">
@@ -313,46 +259,6 @@ function TrackOrderContent() {
               </div>
             )}
 
-            {/* Review Section for Delivered Orders */}
-            {orderData && orderData.order.orderStatus === 'delivered' && (
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h2 className="text-xl font-semibold text-vibe-brown mb-4">Leave a Review</h2>
-                <p className="text-vibe-brown/70 mb-4">
-                  How was your experience with this order? Your feedback helps us improve!
-                </p>
-                
-                {orderData.order.items.map((item, index) => (
-                  <div key={index} className="mb-6 p-4 bg-vibe-bg rounded-lg">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
-                        {item.image && (
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover rounded-lg"
-                            width={64}
-                            height={64}
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-vibe-brown">{item.name}</h4>
-                        <p className="text-sm text-vibe-brown/70">
-                          Size: {item.size} | Quantity: {item.quantity}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <button
-                      onClick={() => handleReviewProduct(item.product._id, item.name)}
-                      className="px-4 py-2 bg-vibe-cookie text-white rounded-lg hover:bg-vibe-brown focus:outline-none focus:ring-2 focus:ring-vibe-cookie transition-colors"
-                    >
-                      Review This Product
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
 
             {/* Order Timeline */}
             <div className="bg-white rounded-2xl shadow-lg p-6">

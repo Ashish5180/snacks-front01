@@ -9,7 +9,7 @@ import { useCart } from '../../context/CartContext'
 import { useToast } from '../../components/Toaster'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react'
-// import RazorpayPayment from '../../components/RazorpayPayment' // Commented out - COD only for now
+import RazorpayPayment from '../../components/RazorpayPayment'
 
 const CheckoutPage = () => {
   const { items, getCartTotal, appliedCoupon, removeCoupon, clearCart } = useCart()
@@ -24,7 +24,7 @@ const CheckoutPage = () => {
     city: '',
     state: '',
     pincode: '',
-    paymentMethod: 'cod'
+    paymentMethod: 'razorpay' // Default to Razorpay for better user experience
   })
   const [createdOrder, setCreatedOrder] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -307,8 +307,8 @@ const CheckoutPage = () => {
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-xl font-semibold text-vibe-brown mb-6">Payment Method</h2>
               <div className="space-y-4">
-                {/* Razorpay Payment Option - Commented out for now */}
-                {/* <label className="flex items-center p-4 border border-vibe-cookie/30 rounded-lg cursor-pointer hover:bg-vibe-bg transition-colors">
+                {/* Razorpay Payment Option */}
+                <label className="flex items-center p-4 border border-vibe-cookie/30 rounded-lg cursor-pointer hover:bg-vibe-bg transition-colors">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -319,7 +319,7 @@ const CheckoutPage = () => {
                   />
                   <CreditCard className="h-5 w-5 text-vibe-brown mr-3" />
                   <span className="text-vibe-brown">Credit/Debit Card (Razorpay)</span>
-                </label> */}
+                </label>
                 
                 {/* COD Payment Option - Only option available */}
                 <label className="flex items-center p-4 border border-vibe-cookie/30 rounded-lg cursor-pointer hover:bg-vibe-bg transition-colors">
@@ -395,8 +395,7 @@ const CheckoutPage = () => {
               </div>
 
               {/* Place Order Button */}
-              {/* Razorpay Payment Component - Commented out for now */}
-              {/* {formData.paymentMethod === 'razorpay' && createdOrder ? (
+              {formData.paymentMethod === 'razorpay' && createdOrder ? (
                 <RazorpayPayment
                   amount={total}
                   orderId={createdOrder._id}
@@ -408,7 +407,7 @@ const CheckoutPage = () => {
                     phone: formData.phone
                   }}
                 />
-              ) : ( */}
+              ) : (
                 <button
                   onClick={handleSubmit}
                   disabled={isProcessing}
@@ -426,7 +425,7 @@ const CheckoutPage = () => {
                     </>
                   )}
                 </button>
-              {/* )} */}
+              )}
 
               {/* Security Notice */}
               <div className="mt-4 text-center text-sm text-vibe-brown/60">

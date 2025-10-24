@@ -71,6 +71,9 @@ function FeaturedProductsList() {
               style={{ objectFit: 'cover' }}
               priority={idx === 0}
               className="group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.target.src = '/images/hero-snack-1.jpg'
+              }}
             />
           </div>
           <div className="p-4 flex flex-col flex-grow">

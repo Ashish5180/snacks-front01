@@ -86,6 +86,18 @@ const AdminPage = () => {
     }
   }, [isClient])
 
+  // Helper function for file uploads (without Content-Type for FormData)
+  const getFileUploadHeaders = useCallback(() => {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined' || !isClient) {
+      return {}
+    }
+    const token = localStorage.getItem('token')
+    return {
+      'Authorization': `Bearer ${token}`
+      // Don't set Content-Type for FormData - let browser set it with boundary
+    }
+  }, [isClient])
+
   // Fetch shipping settings from backend
   const fetchShippingSettings = useCallback(async () => {
     setIsShippingFeeLoading(true)
@@ -150,7 +162,7 @@ const AdminPage = () => {
       fd.append('image', file)
       const response = await fetch(`${API_BASE_URL}/uploads/banner`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: getFileUploadHeaders(),
         body: fd
       })
       const data = await response.json()

@@ -15,8 +15,6 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
   const [ordersLoading, setOrdersLoading] = useState(true)
-  const [reviews, setReviews] = useState([])
-  const [reviewsLoading, setReviewsLoading] = useState(true)
   const router = useRouter()
   const { addToast } = useToast()
 
@@ -96,25 +94,6 @@ const ProfilePage = () => {
     loadOrders()
   }, [])
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      setReviewsLoading(true)
-      try {
-        const res = await fetch(buildApiUrl('/reviews/user'), {
-          headers: getAuthHeaders()
-        })
-        const data = await res.json()
-        if (data.success) {
-          setReviews(data.data.reviews)
-        }
-      } catch (e) {
-        console.error('Reviews load error:', e)
-      } finally {
-        setReviewsLoading(false)
-      }
-    }
-    loadReviews()
-  }, [])
 
   return (
     <div className="min-h-screen bg-vibe-bg">
@@ -205,102 +184,6 @@ const ProfilePage = () => {
               )}
             </div>
 
-            {/* My Reviews Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
-              <h2 className="text-2xl font-bold text-vibe-brown mb-4">My Reviews</h2>
-              {reviewsLoading ? (
-                <div className="text-vibe-brown/70">Loading reviews...</div>
-              ) : reviews.length === 0 ? (
-                <div className="text-center py-8">
-                  <Package className="h-12 w-12 text-vibe-brown/30 mx-auto mb-4" />
-                  <p className="text-vibe-brown/70">No reviews submitted yet.</p>
-                  <p className="text-vibe-brown/50 text-sm mt-2">Review products after they are delivered to help other customers!</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="border border-vibe-cookie/20 rounded-lg p-4">
-                      <div className="flex items-start gap-4">
-                        {/* Product Image */}
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                          {review.productImage ? (
-                            <Image
-                              src={review.productImage}
-                              alt={review.productName}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-8 w-8 text-vibe-brown/30" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Review Content */}
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <Link 
-                              href={`/product/${review.productId}`}
-                              className="font-semibold text-vibe-brown hover:text-vibe-cookie transition-colors flex items-center gap-1"
-                            >
-                              {review.productName}
-                              <ExternalLink className="h-3 w-3" />
-                            </Link>
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              review.isActive 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-gray-100 text-gray-600'
-                            }`}>
-                              {review.isActive ? 'Published' : 'Pending'}
-                            </span>
-                          </div>
-
-                          {/* Rating */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'text-yellow-400 fill-current'
-                                      : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="text-sm text-vibe-brown/60">
-                              {review.rating}/5
-                            </span>
-                          </div>
-
-                          {/* Review Title */}
-                          <h4 className="font-medium text-vibe-brown mb-2">{review.title}</h4>
-
-                          {/* Review Comment */}
-                          <p className="text-vibe-brown/70 text-sm mb-3">{review.comment}</p>
-
-                          {/* Review Meta */}
-                          <div className="flex items-center gap-4 text-xs text-vibe-brown/50">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {new Date(review.createdAt).toLocaleDateString()}
-                            </div>
-                            {review.orderNumber && (
-                              <div className="flex items-center gap-1">
-                                <Package className="h-3 w-3" />
-                                Order: {review.orderNumber}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </>
         ) : (
           <div className="text-vibe-brown/70">Unable to load profile</div>

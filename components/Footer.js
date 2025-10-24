@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin } from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -29,20 +29,6 @@ const Footer = () => {
               Vibe Every Bite. We&apos;re committed to bringing you the healthiest and tastiest snacks 
               that nourish your body and soul.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-white/60 hover:text-vibe-cookie transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white/60 hover:text-vibe-cookie transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white/60 hover:text-vibe-cookie transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-white/60 hover:text-vibe-cookie transition-colors">
-                <Youtube className="h-5 w-5" />
-              </a>
-            </div>
           </div>
 
           {/* Quick Links */}

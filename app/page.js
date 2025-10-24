@@ -3,7 +3,6 @@ import HeroCarousel from '../components/HeroCarousel'
 import CategorySection from '../components/CategorySection'
 import FeaturedProducts from '../components/FeaturedProducts'
 import WhyChooseUs from '../components/WhyChooseUs'
-import Testimonials from '../components/Testimonials'
 import Footer from '../components/Footer'
 
 export default function Home() {
@@ -14,7 +13,6 @@ export default function Home() {
       <CategorySection />
       <FeaturedProducts />
       <WhyChooseUs />
-      <Testimonials />
       <Footer />
     </main>
   )

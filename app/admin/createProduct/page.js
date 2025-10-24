@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '../../../components/Toaster'
 import { Plus, X, Loader2, Home } from 'lucide-react'
 import { getApiUrl } from '../../../utils/api'
+import Image from 'next/image'
 
 // Remove hardcoded enum, use dynamic categories from backend
 
@@ -420,26 +421,29 @@ const CreateProductPage = () => {
                 {/* Image Preview */}
                 {form.image && (
                   <div className='mt-2'>
-                    <img 
-                      src={form.image} 
-                      alt='Main product preview' 
-                      className='h-32 w-32 object-cover rounded-lg border border-vibe-cookie/30'
-                      onError={(e) => {
-                        // Retry loading the image once after a short delay
-                        setTimeout(() => {
-                          if (e.target.src !== form.image) {
-                            e.target.src = form.image;
-                          } else {
-                            e.target.style.display = 'none'
-                            // addToast('Invalid image URL', 'error')
-                          }
-                        }, 1000);
-                      }}
-                      onLoad={() => {
-                        // Image loaded successfully, ensure it's visible
-                        document.querySelector('.h-32.w-32.object-cover').style.display = 'block';
-                      }}
-                    />
+                    <div className='relative h-32 w-32 rounded-lg border border-vibe-cookie/30 overflow-hidden'>
+                      <Image 
+                        src={form.image} 
+                        alt='Main product preview' 
+                        fill
+                        className='object-cover'
+                        onError={(e) => {
+                          // Retry loading the image once after a short delay
+                          setTimeout(() => {
+                            if (e.target.src !== form.image) {
+                              e.target.src = form.image;
+                            } else {
+                              e.target.style.display = 'none'
+                              // addToast('Invalid image URL', 'error')
+                            }
+                          }, 1000);
+                        }}
+                        onLoad={() => {
+                          // Image loaded successfully, ensure it's visible
+                          document.querySelector('.h-32.w-32.object-cover').style.display = 'block';
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -522,14 +526,17 @@ const CreateProductPage = () => {
                   {/* Image Preview */}
                   {img && (
                     <div className='mt-2'>
-                      <img 
-                        src={img} 
-                        alt={`Additional product preview ${idx + 1}`} 
-                        className='h-24 w-24 object-cover rounded-lg border border-vibe-cookie/30'
-                        onError={(e) => {
-                          e.target.style.display = 'none'
-                        }}
-                      />
+                      <div className='relative h-24 w-24 rounded-lg border border-vibe-cookie/30 overflow-hidden'>
+                        <Image 
+                          src={img} 
+                          alt={`Additional product preview ${idx + 1}`} 
+                          fill
+                          className='object-cover'
+                          onError={(e) => {
+                            e.target.style.display = 'none'
+                          }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

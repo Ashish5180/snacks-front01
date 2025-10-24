@@ -39,12 +39,22 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
       return
     }
 
+    if (!amount || amount <= 0) {
+      addToast('Invalid payment amount', 'error')
+      return
+    }
+
+    if (!orderId) {
+      addToast('Order ID is missing', 'error')
+      return
+    }
+
     setLoading(true)
 
     try {
       
       // Get Razorpay key
-      const keyRes = await fetch(`${'/api'}/payments/razorpay/keys`, {
+      const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
         headers: getAuthHeaders()
       })
       const keyData = await keyRes.json()
@@ -54,11 +64,8 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
       }
 
       // Create Razorpay order
-      const orderRes = await fetch(`${'/api'}/payments/razorpay/create-order`, {
+      const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         headers: getAuthHeaders(),
         body: JSON.stringify({
           amount: amount,
@@ -92,12 +99,9 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
         handler: async function (response) {
           try {
             // Verify payment
-            const verifyRes = await fetch(`${'/api'}/payments/razorpay/verify`, {
+            const verifyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/verify`, {
               method: 'POST',
-              headers: {
-          'Content-Type': 'application/json'
-        },
-        headers: getAuthHeaders(),
+              headers: getAuthHeaders(),
               body: JSON.stringify({
                 orderId: response.razorpay_order_id,
                 paymentId: response.razorpay_payment_id,
@@ -108,9 +112,10 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
             const verifyData = await verifyRes.json()
             
             if (verifyRes.ok && verifyData.success) {
-              addToast('Payment successful!', 'success')
+              addToast('Payment successful! Order confirmed.', 'success')
               onSuccess(response)
             } else {
+              console.error('Payment verification failed:', verifyData)
               throw new Error(verifyData.message || 'Payment verification failed')
             }
           } catch (error) {
