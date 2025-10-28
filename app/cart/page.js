@@ -39,7 +39,8 @@ const CartPage = () => {
     return (
       <div className="min-h-screen bg-vibe-bg">
         <Navbar />
-        <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+        <div className="pt-20">
+          <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
           <div className="text-center flex flex-col items-center justify-center">
             <ShoppingBag className="h-20 w-20 sm:h-24 sm:w-24 text-vibe-brown/40 mx-auto mb-6" />
             <h1 className="text-2xl sm:text-3xl font-bold text-vibe-brown mb-4">Your Cart is Empty</h1>
@@ -55,6 +56,7 @@ const CartPage = () => {
             </Link>
           </div>
         </div>
+        </div>
         <Footer />
       </div>
     )
@@ -63,7 +65,8 @@ const CartPage = () => {
   return (
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
-      <div className="max-w-6xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="pt-20">
+        <div className="max-w-6xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-vibe-brown mb-2">Shopping Cart</h1>
           <p className="text-vibe-brown/70">
@@ -192,6 +195,7 @@ const CartPage = () => {
               </Link>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

@@ -9,11 +9,15 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-vibe-bg">
       <Navbar />
-      <HeroCarousel />
-      <CategorySection />
-      <FeaturedProducts />
-      <WhyChooseUs />
-      <Footer />
+      <div className="relative">
+        <HeroCarousel />
+        <div className="-mt-4">
+          <CategorySection />
+          <FeaturedProducts />
+          <WhyChooseUs />
+          <Footer />
+        </div>
+      </div>
     </main>
   )
 }

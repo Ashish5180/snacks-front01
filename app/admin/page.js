@@ -65,6 +65,11 @@ const AdminPage = () => {
   const [isShippingFeeLoading, setIsShippingFeeLoading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState(false)
   const [bannerUrls, setBannerUrls] = useState(['', '', ''])
+  const [bannerConfigs, setBannerConfigs] = useState([
+    { title: 'Bite into Happiness', subtitle: 'Crunchy, healthy, and 100% natural snacks', button: 'Shop Now', link: '/products' },
+    { title: 'Taste the Vibe', subtitle: 'Handcrafted snacks that love you back', button: 'Explore Flavors', link: '/products' },
+    { title: 'Free Shipping on Orders ₹500+', subtitle: 'Pan-India delivery in 3–5 days', button: 'Start Shopping', link: '/products' }
+  ])
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   
@@ -182,6 +187,34 @@ const AdminPage = () => {
       setBannerUploading(false)
     }
   }
+
+  // Save banner configuration to backend
+  const saveBannerConfig = async () => {
+    try {
+      const banners = bannerUrls.map((url, index) => ({
+        image: url || `/images/hero-snack-${index + 1}.jpg`,
+        title: bannerConfigs[index].title,
+        subtitle: bannerConfigs[index].subtitle,
+        button: bannerConfigs[index].button,
+        link: bannerConfigs[index].link
+      }));
+
+      const response = await fetch(`${API_BASE_URL}/admin/banners`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ banners })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        addToast('Banner configuration saved successfully!', 'success');
+      } else {
+        addToast(data.message || 'Failed to save banner configuration', 'error');
+      }
+    } catch (error) {
+      addToast('Error saving banner configuration', 'error');
+    }
+  };
 
   // Set client state first
   useEffect(() => {
@@ -739,20 +772,99 @@ Verified: ${review.verified ? 'Yes' : 'No'}
             {/* Banner Uploads */}
             <div className="bg-white rounded-lg shadow-sm border border-vibe-cookie p-6">
               <h3 className="text-lg font-semibold text-vibe-brown mb-4">Homepage Banners</h3>
-              <p className="text-sm text-vibe-brown/70 mb-4">Upload up to 3 banner images. Copy the URLs and paste them into <code>components/HeroCarousel.js</code> slides.</p>
+              <p className="text-sm text-vibe-brown/70 mb-4">Upload banner images and configure their content. Changes will be visible on the homepage immediately after saving.</p>
               {[0,1,2].map((i) => (
-                <div key={i} className="mb-4">
-                  <label className="block text-sm font-medium text-vibe-brown mb-2">Banner #{i+1}</label>
-                  <div className="flex items-center gap-3">
-                    <input id={`banner-upload-${i}`} type="file" accept="image/*" className="hidden" onChange={(e)=>uploadBanner(e.target.files?.[0], i)} disabled={bannerUploading} />
-                    <label htmlFor={`banner-upload-${i}`} className={`px-4 py-2 border-2 border-dashed rounded-md cursor-pointer ${bannerUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{bannerUploading ? 'Uploading...' : 'Upload image'}</label>
-                    <input type="text" value={bannerUrls[i]} readOnly className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md text-sm" placeholder="Image URL will appear here after upload" />
-                    {bannerUrls[i] && (
-                      <a href={bannerUrls[i]} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">View</a>
-                    )}
+                <div key={i} className="mb-6 p-4 border border-vibe-cookie rounded-lg">
+                  <h4 className="text-md font-medium text-vibe-brown mb-3">Banner #{i+1}</h4>
+                  
+                  {/* Image Upload */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-vibe-brown mb-2">Image</label>
+                    <div className="flex items-center gap-3">
+                      <input id={`banner-upload-${i}`} type="file" accept="image/*" className="hidden" onChange={(e)=>uploadBanner(e.target.files?.[0], i)} disabled={bannerUploading} />
+                      <label htmlFor={`banner-upload-${i}`} className={`px-4 py-2 border-2 border-dashed rounded-md cursor-pointer ${bannerUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>{bannerUploading ? 'Uploading...' : 'Upload image'}</label>
+                      <input type="text" value={bannerUrls[i]} readOnly className="flex-1 px-3 py-2 border border-vibe-cookie rounded-md text-sm" placeholder="Image URL will appear here after upload" />
+                      {bannerUrls[i] && (
+                        <a href={bannerUrls[i]} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:underline">View</a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-vibe-brown mb-2">Title</label>
+                    <input 
+                      type="text" 
+                      value={bannerConfigs[i].title} 
+                      onChange={(e) => setBannerConfigs(prev => {
+                        const c = [...prev];
+                        c[i] = { ...c[i], title: e.target.value };
+                        return c;
+                      })}
+                      className="w-full px-3 py-2 border border-vibe-cookie rounded-md text-sm" 
+                      placeholder="Enter banner title" 
+                    />
+                  </div>
+
+                  {/* Subtitle */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-vibe-brown mb-2">Subtitle</label>
+                    <input 
+                      type="text" 
+                      value={bannerConfigs[i].subtitle} 
+                      onChange={(e) => setBannerConfigs(prev => {
+                        const c = [...prev];
+                        c[i] = { ...c[i], subtitle: e.target.value };
+                        return c;
+                      })}
+                      className="w-full px-3 py-2 border border-vibe-cookie rounded-md text-sm" 
+                      placeholder="Enter banner subtitle" 
+                    />
+                  </div>
+
+                  {/* Button Text */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-vibe-brown mb-2">Button Text</label>
+                    <input 
+                      type="text" 
+                      value={bannerConfigs[i].button} 
+                      onChange={(e) => setBannerConfigs(prev => {
+                        const c = [...prev];
+                        c[i] = { ...c[i], button: e.target.value };
+                        return c;
+                      })}
+                      className="w-full px-3 py-2 border border-vibe-cookie rounded-md text-sm" 
+                      placeholder="Enter button text" 
+                    />
+                  </div>
+
+                  {/* Link */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-vibe-brown mb-2">Link</label>
+                    <input 
+                      type="text" 
+                      value={bannerConfigs[i].link} 
+                      onChange={(e) => setBannerConfigs(prev => {
+                        const c = [...prev];
+                        c[i] = { ...c[i], link: e.target.value };
+                        return c;
+                      })}
+                      className="w-full px-3 py-2 border border-vibe-cookie rounded-md text-sm" 
+                      placeholder="Enter link (e.g., /products)" 
+                    />
                   </div>
                 </div>
               ))}
+              
+              {/* Save Button */}
+              <div className="flex justify-end">
+                <button 
+                  onClick={saveBannerConfig}
+                  className="px-6 py-2 bg-vibe-cookie text-vibe-brown font-semibold rounded-md hover:bg-vibe-accent transition-colors duration-300"
+                >
+                  Save Banner Configuration
+                </button>
+              </div>
             </div>
           </div>
         )}

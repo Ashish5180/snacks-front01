@@ -83,22 +83,23 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-vibe-bg border-b-2 border-vibe-cookie sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white/80 backdrop-blur-md border border-white/20 rounded-full shadow-lg shadow-black/5">
+          <div className="flex justify-between items-center h-16 px-6">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <div className="relative w-24 h-12 sm:w-32 sm:h-14 md:w-36 md:h-16 transition-all duration-200">
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 transition-all duration-200 rounded-full overflow-hidden bg-white/50 backdrop-blur-sm border border-white/30 mx-2">
                 <Image
                   src="/images/logo.jpeg"
                   alt="VIBE BITES"
                   fill
-                  className="object-contain"
+                  className="object-cover"
                   priority
                 />
               </div>
-              <span className="ml-2 text-vibe-brown font-bold text-sm sm:text-lg md:text-xl hidden sm:block whitespace-nowrap">
+              <span className="ml-2 text-vibe-brown font-bold text-sm sm:text-base md:text-lg hidden sm:block whitespace-nowrap">
                 VIBE BITES
               </span>
             </Link>
@@ -106,28 +107,28 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
+            <div className="ml-10 flex items-baseline space-x-2">
               <Link
                 href="/"
-                className="text-vibe-brown hover:text-vibe-cookie px-3 py-2 rounded-md text-sm font-medium transition-colors relative z-50"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
               >
                 Home
               </Link>
               <Link
                 href="/products"
-                className="text-vibe-brown hover:text-vibe-cookie px-3 py-2 rounded-md text-sm font-medium transition-colors relative z-50"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
               >
                 Products
               </Link>
               <Link
                 href="/about"
-                className="text-vibe-brown hover:text-vibe-cookie px-3 py-2 rounded-md text-sm font-medium transition-colors relative z-50"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
               >
                 About
               </Link>
               <Link
                 href="/contact"
-                className="text-vibe-brown hover:text-vibe-cookie px-3 py-2 rounded-md text-sm font-medium transition-colors relative z-50"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200"
               >
                 Contact
               </Link>
@@ -145,30 +146,30 @@ const Navbar = () => {
                 placeholder="Search snacks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-vibe-cookie rounded-full text-sm bg-white text-vibe-brown placeholder-vibe-brown focus:outline-none focus:ring-2 focus:ring-vibe-cookie focus:border-transparent"
+                className="block w-full pl-10 pr-4 py-2.5 border border-white/30 rounded-full text-sm bg-white/50 backdrop-blur-sm text-vibe-brown placeholder-vibe-brown/70 focus:outline-none focus:ring-2 focus:ring-vibe-cookie/50 focus:border-vibe-cookie/50 transition-all duration-200"
               />
             </form>
           </div>
 
           {/* Desktop Icons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2">
             <button 
               onClick={handleUserClick}
-              className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-2.5 rounded-full transition-all duration-200"
               title="User Profile"
             >
               <User className="h-6 w-6" />
             </button>
             <button 
               onClick={handleWishlistClick}
-              className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-2.5 rounded-full transition-all duration-200"
               title="Wishlist"
             >
               <Heart className="h-6 w-6" />
             </button>
             <button
               onClick={handleCartClick}
-              className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors relative"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-2.5 rounded-full transition-all duration-200 relative"
               title="Shopping Cart"
             >
               <ShoppingCart className="h-6 w-6" />
@@ -184,7 +185,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-md transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-2.5 rounded-full transition-all duration-200"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
@@ -194,46 +195,47 @@ const Navbar = () => {
               )}
             </button>
           </div>
+          </div>
         </div>
       </div>
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-vibe-bg border-t border-vibe-cookie">
+        <div className="md:hidden mt-4">
+          <div className="bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg shadow-black/5 px-4 pt-4 pb-4 space-y-2">
             <Link
               href="/"
-              className=" relative text-vibe-brown hover:text-vibe-cookie block px-3 py-2 rounded-md text-base font-medium transition-colors z-50"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               href="/products"
-              className="text-vibe-brown hover:text-vibe-cookie block px-3 py-2 rounded-md text-base font-medium transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Products
             </Link>
             <Link
               href="/about"
-              className="text-vibe-brown hover:text-vibe-cookie block px-3 py-2 rounded-md text-base font-medium transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               About
             </Link>
             <Link
               href="/contact"
-              className="text-vibe-brown hover:text-vibe-cookie block px-3 py-2 rounded-md text-base font-medium transition-colors"
+              className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact
             </Link>
             
             {/* Mobile Search */}
-            <div className="px-3 py-2">
+            <div className="px-4 py-2">
               <form onSubmit={handleSearch} className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-vibe-brown" />
                 </div>
                 <input
@@ -241,19 +243,19 @@ const Navbar = () => {
                   placeholder="Search snacks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-vibe-cookie rounded-full text-sm bg-white text-vibe-brown placeholder-vibe-brown focus:outline-none focus:ring-2 focus:ring-vibe-cookie focus:border-transparent"
+                  className="block w-full pl-12 pr-4 py-3 border border-white/30 rounded-full text-sm bg-white/50 backdrop-blur-sm text-vibe-brown placeholder-vibe-brown/70 focus:outline-none focus:ring-2 focus:ring-vibe-cookie/50 focus:border-vibe-cookie/50 transition-all duration-200"
                 />
               </form>
             </div>
 
             {/* Mobile Icons */}
-            <div className="flex items-center space-x-4 px-3 py-2">
+            <div className="flex items-center justify-center space-x-6 px-4 py-3">
               <button 
                 onClick={() => {
                   handleUserClick()
                   setIsMenuOpen(false)
                 }}
-                className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-3 rounded-full transition-all duration-200"
                 title="User Profile"
               >
                 <User className="h-6 w-6" />
@@ -263,7 +265,7 @@ const Navbar = () => {
                   handleWishlistClick()
                   setIsMenuOpen(false)
                 }}
-                className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-3 rounded-full transition-all duration-200"
                 title="Wishlist"
               >
                 <Heart className="h-6 w-6" />
@@ -273,7 +275,7 @@ const Navbar = () => {
                   handleCartClick()
                   setIsMenuOpen(false)
                 }}
-                className="text-vibe-brown hover:text-vibe-cookie p-2 rounded-full transition-colors relative"
+                className="text-vibe-brown hover:text-vibe-cookie hover:bg-white/50 p-3 rounded-full transition-all duration-200 relative"
                 title="Shopping Cart"
               >
                 <ShoppingCart className="h-6 w-6" />
@@ -287,13 +289,13 @@ const Navbar = () => {
 
             {/* Mobile Logout Button */}
             {(typeof window !== 'undefined' && typeof localStorage !== 'undefined' && localStorage.getItem('token')) && (
-              <div className="px-3 py-2 border-t border-vibe-cookie/20">
+              <div className="px-4 py-2 border-t border-white/20">
                 <button
                   onClick={() => {
                     router.push('/logout')
                     setIsMenuOpen(false)
                   }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 font-medium"
+                  className="flex items-center gap-2 w-full px-4 py-3 text-red-600 hover:text-red-700 hover:bg-red-50/50 rounded-xl transition-all duration-200 font-medium"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout

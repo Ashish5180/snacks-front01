@@ -143,7 +143,8 @@ function ProductsContent() {
 			</Head>
 			<div className="min-h-screen bg-vibe-bg">
 				<Navbar />
-				<div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+				<div className="pt-20">
+					<div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
 					<div className="mb-8">
 						<h1 className="text-3xl md:text-4xl font-bold text-vibe-brown mb-4">Our Products</h1>
 						<p className="text-lg text-vibe-brown/70">Discover our range of healthy and delicious snacks</p>
@@ -225,6 +226,7 @@ function ProductsContent() {
 								</div>
 							)}
 						</div>
+					</div>
 					</div>
 				</div>
 				<Footer />
