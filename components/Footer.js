@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin, Instagram, Youtube, MessageCircle } from 'lucide-react'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -114,14 +114,50 @@ const Footer = () => {
               </div>
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-vibe-cookie mr-3 flex-shrink-0" />
-                <a href="tel:+919874120380" className="text-white/80 hover:text-vibe-cookie transition-colors">
-                  +91 9874120380
+                <a href="tel:+918697380653" className="text-white/80 hover:text-vibe-cookie transition-colors">
+                  +91 86973 80653
                 </a>
               </div>
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-vibe-cookie mr-3 flex-shrink-0" />
                 <a href="mailto:support@vibebites.shop" className="text-white/80 hover:text-vibe-cookie transition-colors">
                   support@vibebites.shop
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Media Section */}
+          <div className="lg:col-span-4 mt-8">
+            <div className="bg-white/10 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold mb-4 text-center">Follow Us</h3>
+              <div className="flex justify-center gap-4 flex-wrap">
+                <a 
+                  href="https://www.instagram.com/vibebites_25?utm_source=qr&igsh=b2EyMWJ0a3FyOHd3" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105"
+                >
+                  <Instagram className="h-4 w-4" />
+                  <span className="hidden sm:inline">Instagram</span>
+                </a>
+                <a 
+                  href="https://wa.me/message/YJ6KYWC4AX7WP1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all duration-300 hover:scale-105"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">WhatsApp</span>
+                </a>
+                <a 
+                  href="https://youtube.com/@vibebites_025?si=tYJxMOitQentjAVs" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 hover:scale-105"
+                >
+                  <Youtube className="h-4 w-4" />
+                  <span className="hidden sm:inline">YouTube</span>
                 </a>
               </div>
             </div>

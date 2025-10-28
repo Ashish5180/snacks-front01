@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Send, Instagram, Youtube, MessageCircle } from 'lucide-react'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -150,8 +150,8 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-vibe-brown mb-1">Phone</h3>
                     <p className="text-vibe-brown/70">
-                      <a href="tel:+919874120380" className="hover:text-vibe-cookie transition-colors">
-                        +91 98741 20380
+                      <a href="tel:+918697380653" className="hover:text-vibe-cookie transition-colors">
+                        +91 86973 80653
                       </a>
                     </p>
                   </div>
@@ -178,6 +178,47 @@ export default function ContactPage() {
                       Saturday: 10:00 AM - 4:00 PM<br />
                       Sunday: Closed
                     </p>
+                  </div>
+                </div>
+                
+                {/* Social Media Links */}
+                <div className="flex items-start">
+                  <div className="h-6 w-6 mt-1 mr-4 flex-shrink-0 flex items-center justify-center">
+                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">S</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-vibe-brown mb-3">Follow Us</h3>
+                    <div className="flex flex-wrap gap-4">
+                      <a 
+                        href="https://www.instagram.com/vibebites_25?utm_source=qr&igsh=b2EyMWJ0a3FyOHd3" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-sm font-medium"
+                      >
+                        <Instagram className="h-4 w-4" />
+                        Instagram
+                      </a>
+                      <a 
+                        href="https://wa.me/message/YJ6KYWC4AX7WP1" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all duration-300 text-sm font-medium"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        WhatsApp
+                      </a>
+                      <a 
+                        href="https://youtube.com/@vibebites_025?si=tYJxMOitQentjAVs" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all duration-300 text-sm font-medium"
+                      >
+                        <Youtube className="h-4 w-4" />
+                        YouTube
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
