@@ -95,6 +95,17 @@ client/
 
 ## 🐛 Recent Fixes
 
+### Payment Gateway & Backend Optimization (Latest - November 2025)
+- **Razorpay Script Preloading**: Moved Razorpay script loading to layout level using Next.js Script component with `afterInteractive` strategy
+- **Backend Keep-Alive System**: Implemented automatic health-check pinging every 5 minutes to prevent Render.com cold starts
+- **Smart Warmup on Checkout**: Checkout page now warms up backend immediately on mount for faster order creation
+- **Progressive Loading Messages**: Real-time feedback showing "Connecting to server", "Creating order", "Opening payment gateway"
+- **Backend Status Indicators**: Visual warning when backend is cold with user-friendly messaging
+- **Payment Data Caching**: Intelligent caching for Razorpay keys and order data to minimize API calls
+- **Eliminated 30-60s Cold Start Delays**: Backend stays warm and responds instantly instead of sleeping
+- **Enhanced Error Handling**: Better error messages and fallback mechanisms for payment failures
+- **Optimized Order Flow**: Complete order creation to payment flow optimization with detailed progress tracking
+
 ### UI/UX Improvements (Latest - January 2025)
 - **Fixed Featured Products Navigation**: Made entire product cards clickable with hover effects and smooth transitions
 - **Improved Carousel Performance**: Reduced carousel display time from 2.5s to 1.5s for better sliding effect

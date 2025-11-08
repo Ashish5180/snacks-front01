@@ -4,12 +4,12 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useToast } from './Toaster'
 
 const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
-  const [loading, setLoading] = useState(false)
   const [razorpayLoaded, setRazorpayLoaded] = useState(false)
-  const [initializing, setInitializing] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [verifying, setVerifying] = useState(false)
   const { addToast } = useToast()
   const razorpayKeyRef = useRef(null)
-  const scriptLoadedRef = useRef(false)
+  const razorpayOrderRef = useRef(null)
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
@@ -23,66 +23,108 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
     }
   }
 
-  // Preload Razorpay script and key
+  // Check if Razorpay script is loaded and preload payment data
   useEffect(() => {
-    const preloadRazorpay = async () => {
+    // Check if Razorpay is available (loaded via layout)
+    const checkRazorpayScript = () => {
+      if (typeof window !== 'undefined' && window.Razorpay) {
+        setRazorpayLoaded(true)
+        return true
+      }
+      return false
+    }
+
+    // Immediate check
+    if (checkRazorpayScript()) {
+      return
+    }
+
+    // Poll for script if not loaded yet (with timeout)
+    const pollInterval = setInterval(() => {
+      if (checkRazorpayScript()) {
+        clearInterval(pollInterval)
+      }
+    }, 100)
+
+    // Clear after 5 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(pollInterval)
+      if (!razorpayLoaded) {
+        console.error('Razorpay script failed to load')
+        addToast('Payment system failed to load. Please refresh the page.', 'error')
+      }
+    }, 5000)
+
+    return () => {
+      clearInterval(pollInterval)
+      clearTimeout(timeout)
+    }
+  }, [razorpayLoaded, addToast])
+
+  // Preload Razorpay key and order when component mounts
+  useEffect(() => {
+    if (!razorpayLoaded || !orderId || razorpayKeyRef.current) return
+
+    const preloadPaymentData = async () => {
       try {
-        // Load Razorpay script if not already loaded
-        if (!scriptLoadedRef.current) {
-          const script = document.createElement('script')
-          script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-          script.async = true
-          script.onload = () => {
-            setRazorpayLoaded(true)
-            scriptLoadedRef.current = true
-          }
-          script.onerror = () => {
-            console.error('Failed to load Razorpay script')
-            addToast('Payment system failed to load', 'error')
-          }
-          document.head.appendChild(script)
+        // Fetch Razorpay key
+        const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
+          headers: getAuthHeaders()
+        })
+        const keyData = await keyRes.json()
+        
+        if (keyRes.ok && keyData.success) {
+          razorpayKeyRef.current = keyData.data.keyId
         }
 
-        // Preload Razorpay key
-        if (!razorpayKeyRef.current) {
-          const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
-            headers: getAuthHeaders()
+        // Prefetch and cache the order
+        const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            amount: amount,
+            currency: 'INR',
+            orderId: orderId
           })
-          const keyData = await keyRes.json()
-          
-          if (keyRes.ok && keyData.success) {
-            razorpayKeyRef.current = keyData.data.keyId
-          }
+        })
+
+        const orderData = await orderRes.json()
+        
+        if (orderRes.ok && orderData.success) {
+          razorpayOrderRef.current = orderData.data
         }
       } catch (error) {
-        console.error('Preload error:', error)
+        console.error('Preload payment data error:', error)
       }
     }
 
-    preloadRazorpay()
-  }, [addToast])
+    preloadPaymentData()
+  }, [razorpayLoaded, orderId, amount])
 
   const handlePayment = useCallback(async () => {
+    // Immediate feedback
+    setIsProcessing(true)
+    
     if (!razorpayLoaded) {
       addToast('Payment system is loading, please wait...', 'error')
+      setIsProcessing(false)
       return
     }
 
     if (!amount || amount <= 0) {
       addToast('Invalid payment amount', 'error')
+      setIsProcessing(false)
       return
     }
 
     if (!orderId) {
       addToast('Order ID is missing', 'error')
+      setIsProcessing(false)
       return
     }
 
-    setLoading(true)
-    setInitializing(true)
-
     try {
-      // Use preloaded key or fetch if not available
+      // Use cached key or fetch if not available
       let razorpayKey = razorpayKeyRef.current
       if (!razorpayKey) {
         const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
@@ -97,33 +139,37 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
         razorpayKeyRef.current = razorpayKey
       }
 
-      // Create Razorpay order
-      const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          amount: amount,
-          currency: 'INR',
-          orderId: orderId
+      // Use cached order or create new one
+      let orderData = razorpayOrderRef.current
+      if (!orderData) {
+        const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            amount: amount,
+            currency: 'INR',
+            orderId: orderId
+          })
         })
-      })
 
-      const orderData = await orderRes.json()
-      
-      if (!orderRes.ok || !orderData.success) {
-        throw new Error(orderData.message || 'Failed to create payment order')
+        const orderResponse = await orderRes.json()
+        
+        if (!orderRes.ok || !orderResponse.success) {
+          throw new Error(orderResponse.message || 'Failed to create payment order')
+        }
+        
+        orderData = orderResponse.data
+        razorpayOrderRef.current = orderData
       }
-
-      setInitializing(false)
 
       // Razorpay options with enhanced configuration
       const options = {
         key: razorpayKey,
-        amount: orderData.data.amount,
-        currency: orderData.data.currency,
+        amount: orderData.amount,
+        currency: orderData.currency,
         name: 'VIBE BITES',
         description: 'Order Payment',
-        order_id: orderData.data.orderId,
+        order_id: orderData.orderId,
         prefill: {
           name: userInfo?.name || '',
           email: userInfo?.email || '',
@@ -135,7 +181,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
         },
         modal: {
           ondismiss: function() {
-            setLoading(false)
+            setIsProcessing(false)
             addToast('Payment cancelled', 'info')
           },
           escape: true,
@@ -143,7 +189,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
         },
         handler: async function (response) {
           try {
-            setLoading(true)
+            setVerifying(true)
             // Verify payment
             const verifyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/verify`, {
               method: 'POST',
@@ -169,7 +215,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
             addToast('Payment verification failed', 'error')
             onError(error)
           } finally {
-            setLoading(false)
+            setVerifying(false)
           }
         },
         retry: {
@@ -180,23 +226,24 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
         remember_customer: true
       }
 
-      // Open Razorpay with smooth animation
+      // Open Razorpay directly
       const razorpay = new window.Razorpay(options)
       razorpay.on('payment.failed', function (response) {
         console.error('Payment failed:', response.error)
+        setIsProcessing(false)
         addToast('Payment failed: ' + response.error.description, 'error')
-        setLoading(false)
         onError(response.error)
       })
 
       razorpay.open()
+      // Reset processing state after opening modal
+      setIsProcessing(false)
 
     } catch (error) {
       console.error('Payment error:', error)
+      setIsProcessing(false)
       addToast(error.message || 'Payment failed', 'error')
       onError(error)
-      setLoading(false)
-      setInitializing(false)
     }
   }, [razorpayLoaded, amount, orderId, userInfo, onSuccess, onError, addToast])
 
@@ -204,22 +251,18 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
     <div className="relative">
       <button
         onClick={handlePayment}
-        disabled={loading || !razorpayLoaded}
+        disabled={!razorpayLoaded || isProcessing || verifying}
         className="w-full inline-flex items-center justify-center px-6 py-3 bg-vibe-cookie text-vibe-brown font-semibold rounded-full hover:bg-vibe-accent transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
       >
-        {loading ? (
+        {verifying ? (
           <>
-            {initializing ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-vibe-brown mr-2"></div>
-                Initializing...
-              </>
-            ) : (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-vibe-brown mr-2"></div>
-                Processing...
-              </>
-            )}
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-vibe-brown mr-2"></div>
+            Verifying Payment...
+          </>
+        ) : isProcessing ? (
+          <>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-vibe-brown mr-2"></div>
+            Opening Payment Gateway...
           </>
         ) : (
           <>
@@ -230,21 +273,6 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
           </>
         )}
       </button>
-      
-      {/* Loading overlay for better UX */}
-      {loading && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm mx-4 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vibe-brown mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-vibe-brown mb-2">
-              {initializing ? 'Initializing Payment...' : 'Processing Payment...'}
-            </h3>
-            <p className="text-sm text-vibe-brown/70">
-              {initializing ? 'Please wait while we set up your payment' : 'Please complete the payment in the popup'}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

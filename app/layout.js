@@ -1,9 +1,11 @@
 // These styles apply to every route in the application
 import './globals.css'
+import Script from 'next/script'
 import { CartProvider } from '../context/CartContext'
 import { WishlistProvider } from '../context/WishlistContext'
 import { ToastProvider } from '../components/Toaster'
 import GoToCartBar from '../components/GoToCartBar'
+import BackendKeepAlive from '../components/BackendKeepAlive'
 
 export const metadata = {
   title: {
@@ -87,6 +89,13 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+        {/* Preload Razorpay script for faster payment processing */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="afterInteractive"
+        />
+        {/* Keep backend alive to prevent cold starts */}
+        <BackendKeepAlive />
         <ToastProvider>
           <CartProvider>
             <WishlistProvider>

@@ -6,6 +6,7 @@ const nextConfig = {
 			"imgs.search.brave.com",
 			"media.istockphoto.com",
 			"localhost",
+			"snacks-back01.onrender.com",
 			// add more domains as needed
 		],
 		remotePatterns: [

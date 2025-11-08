@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
@@ -8,8 +8,10 @@ import Footer from '../../components/Footer'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../components/Toaster'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from 'lucide-react'
+import { ArrowLeft, CreditCard, Shield, CheckCircle, Loader } from 'lucide-react'
+// Truck icon removed - was only used for COD option which we don't need now
 import RazorpayPayment from '../../components/RazorpayPayment'
+import { warmUpBackend } from '../../utils/keepAlive'
 
 const CheckoutPage = () => {
   const { items, getCartTotal, appliedCoupon, removeCoupon, clearCart } = useCart()
@@ -28,6 +30,17 @@ const CheckoutPage = () => {
   })
   const [createdOrder, setCreatedOrder] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
+  const [backendReady, setBackendReady] = useState(false)
+
+  // Warm up backend on mount
+  useEffect(() => {
+    const warmup = async () => {
+      const isReady = await warmUpBackend()
+      setBackendReady(isReady)
+    }
+    warmup()
+  }, [])
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
@@ -113,30 +126,29 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsProcessing(true)
-
+    
     try {
-      if (formData.paymentMethod === 'cod') {
-        // Handle Cash on Delivery
-        const order = await createOrder()
-        if (order) {
-          addToast('Order placed successfully!', 'success')
-          // Clear cart after successful order
-          clearCart()
-          router.push('/checkout/confirmation')
-        } else {
-          addToast('Failed to create order. Please try again.', 'error')
-        }
+      // Show progress messages
+      if (!backendReady) {
+        setLoadingMessage('Connecting to server...')
+        addToast('Please wait, connecting to server...', 'info')
       } else {
-        // For Razorpay, create order first
-        const order = await createOrder()
-        if (order) {
-          setCreatedOrder(order)
-        } else {
-          addToast('Failed to create order. Please try again.', 'error')
-        }
+        setLoadingMessage('Creating your order...')
+      }
+
+      // For Razorpay, create order first
+      const order = await createOrder()
+      
+      if (order) {
+        setLoadingMessage('Order created! Opening payment gateway...')
+        setCreatedOrder(order)
+      } else {
+        setLoadingMessage('')
+        addToast('Failed to create order. Please try again.', 'error')
       }
     } catch (err) {
       console.error('Order creation error:', err)
+      setLoadingMessage('')
       addToast('Something went wrong. Please try again.', 'error')
     } finally {
       setIsProcessing(false)
@@ -321,8 +333,8 @@ const CheckoutPage = () => {
                   <span className="text-vibe-brown">Credit/Debit Card (Razorpay)</span>
                 </label>
                 
-                {/* COD Payment Option - Only option available */}
-                <label className="flex items-center p-4 border border-vibe-cookie/30 rounded-lg cursor-pointer hover:bg-vibe-bg transition-colors">
+                {/* COD Payment Option - Commented out as we don't need it now */}
+                {/* <label className="flex items-center p-4 border border-vibe-cookie/30 rounded-lg cursor-pointer hover:bg-vibe-bg transition-colors">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -333,7 +345,7 @@ const CheckoutPage = () => {
                   />
                   <Truck className="h-5 w-5 text-vibe-brown mr-3" />
                   <span className="text-vibe-brown">Cash on Delivery</span>
-                </label>
+                </label> */}
               </div>
             </div>
           </div>
@@ -408,6 +420,33 @@ const CheckoutPage = () => {
                   }}
                 />
               ) : (
+                <>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isProcessing}
+                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-vibe-cookie text-vibe-brown font-semibold rounded-full hover:bg-vibe-accent transition-colors duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader className="mr-2 h-5 w-5 animate-spin" />
+                        {loadingMessage || 'Processing...'}
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="mr-2 h-5 w-5" />
+                        Place Order
+                      </>
+                    )}
+                  </button>
+                  {!backendReady && !isProcessing && (
+                    <div className="mt-3 text-center text-sm text-yellow-600 bg-yellow-50 p-2 rounded-lg">
+                      ⏱️ Server is warming up... First order may take a moment
+                    </div>
+                  )}
+                </>
+              )}
+              {/* COD Button - Commented out as we don't need it now */}
+              {/* {formData.paymentMethod === 'cod' ? (
                 <button
                   onClick={handleSubmit}
                   disabled={isProcessing}
@@ -425,7 +464,7 @@ const CheckoutPage = () => {
                     </>
                   )}
                 </button>
-              )}
+              ) : null} */}
 
               {/* Security Notice */}
               <div className="mt-4 text-center text-sm text-vibe-brown/60">
