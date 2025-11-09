@@ -98,13 +98,17 @@ client/
 ### Payment Gateway & Backend Optimization (Latest - November 2025)
 - **Razorpay Script Preloading**: Moved Razorpay script loading to layout level using Next.js Script component with `afterInteractive` strategy
 - **Backend Keep-Alive System**: Implemented automatic health-check pinging every 5 minutes to prevent Render.com cold starts
-- **Smart Warmup on Checkout**: Checkout page now warms up backend immediately on mount for faster order creation
-- **Progressive Loading Messages**: Real-time feedback showing "Connecting to server", "Creating order", "Opening payment gateway"
+- **Aggressive Multi-Attempt Warmup**: 3-attempt retry system with 15-second timeout per attempt (45s total) to reliably wake backend
+- **Full-Screen Warmup Overlay**: Beautiful loading modal on checkout showing real-time connection progress
+- **Cart Page Pre-Warming**: Backend warms up silently when user views cart, ready before checkout
+- **Intelligent Retry Mechanism**: Order creation auto-retries up to 2 times on failures with clear user feedback
+- **45-Second Request Timeout**: Long timeout for order creation with intermediate progress messages
+- **Progressive Loading Messages**: Real-time feedback: "Attempt 1/3", "Connected in 12.3s", "Creating order", "Retrying"
 - **Backend Status Indicators**: Visual warning when backend is cold with user-friendly messaging
 - **Payment Data Caching**: Intelligent caching for Razorpay keys and order data to minimize API calls
-- **Eliminated 30-60s Cold Start Delays**: Backend stays warm and responds instantly instead of sleeping
-- **Enhanced Error Handling**: Better error messages and fallback mechanisms for payment failures
-- **Optimized Order Flow**: Complete order creation to payment flow optimization with detailed progress tracking
+- **Eliminated Cold Start UX Issues**: Users see clear progress instead of feeling stuck during 30-60s cold starts
+- **Enhanced Error Handling**: Better error messages, retry logic, and fallback mechanisms
+- **Optimized Complete Flow**: Cart warmup → Checkout aggressive warmup → Order creation with retry → Payment gateway
 
 ### UI/UX Improvements (Latest - January 2025)
 - **Fixed Featured Products Navigation**: Made entire product cards clickable with hover effects and smooth transitions

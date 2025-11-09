@@ -41,24 +41,78 @@ const pingBackend = async () => {
   }
 }
 
-// Warm up backend immediately (for critical pages)
-export const warmUpBackend = async () => {
-  if (typeof window === 'undefined') return
+// Aggressive warmup with multiple attempts and long timeout
+export const warmUpBackend = async (onProgress) => {
+  if (typeof window === 'undefined') return false
+
+  const startTime = Date.now()
+  let attemptCount = 0
+  const maxAttempts = 3
+
+  while (attemptCount < maxAttempts) {
+    attemptCount++
+    
+    try {
+      if (onProgress) {
+        onProgress(`Attempt ${attemptCount}/${maxAttempts}...`)
+      }
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout per attempt
+
+      const response = await fetch(`${BACKEND_URL}/api/products?limit=1`, {
+        method: 'GET',
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
+
+      clearTimeout(timeoutId)
+      
+      if (response.ok) {
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+        console.log(`[WarmUp] Backend ready in ${elapsed}s (${attemptCount} attempts)`)
+        if (onProgress) {
+          onProgress(`Connected in ${elapsed}s!`)
+        }
+        return true
+      }
+    } catch (error) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+      console.log(`[WarmUp] Attempt ${attemptCount} failed after ${elapsed}s:`, error.message)
+      
+      if (attemptCount < maxAttempts) {
+        // Wait 2 seconds before retry
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+    }
+  }
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+  console.log(`[WarmUp] Backend still cold after ${elapsed}s`)
+  if (onProgress) {
+    onProgress(`Still warming up after ${elapsed}s...`)
+  }
+  return false
+}
+
+// Quick check if backend is responsive (fast timeout)
+export const checkBackendStatus = async () => {
+  if (typeof window === 'undefined') return false
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 second quick check
 
-    await fetch(`${BACKEND_URL}/api/products?limit=1`, {
-      method: 'GET',
+    const response = await fetch(`${BACKEND_URL}/api/products?limit=1`, {
+      method: 'HEAD',
       signal: controller.signal
     })
 
     clearTimeout(timeoutId)
-    console.log('[WarmUp] Backend is warm and ready')
-    return true
+    return response.ok
   } catch (error) {
-    console.log('[WarmUp] Backend warming up in background')
     return false
   }
 }

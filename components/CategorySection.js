@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
+import SafeImage from './SafeImage'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
@@ -60,9 +60,11 @@ const CategorySection = () => {
         if (!res.ok) throw new Error('Failed to fetch categories');
         const data = await res.json();
         const apiCategories = (data.data.categories || []).map(cat => {
-          const image = typeof window !== 'undefined' && cat.image && cat.image.startsWith('/uploads/')
-            ? `${window.location.protocol}//${window.location.host}${cat.image}`
-            : cat.image;
+          // Handle image URLs - convert relative paths to full URLs
+          let image = cat.image || '/images/hero-snack-1.jpg';
+          if (image && image.startsWith('/uploads/')) {
+            image = `https://snacks-back01.onrender.com${image}`;
+          }
           return { ...cat, image };
         });
         
@@ -110,10 +112,11 @@ const CategorySection = () => {
                 className="group relative overflow-hidden rounded-2xl bg-vibe-bg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
               >
                 <div className="relative h-64">
-                  <Image
-                    src={category.image || '/images/hero-snack-1.jpg'}
+                  <SafeImage
+                    src={category.image}
                     alt={category.name}
                     fill
+                    fallback="/images/hero-snack-1.jpg"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-vibe-brown/60 via-transparent to-transparent"></div>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
+import SafeImage from './SafeImage'
 import Link from 'next/link'
 import { ShoppingCart, Heart, Star, Play } from 'lucide-react'
 import { useCart } from '../context/CartContext'
@@ -73,10 +73,11 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
                 onError={() => setShowVideo(false)}
               />
             ) : (
-              <Image
+              <SafeImage
                 src={product.image}
                 alt={product.name}
                 fill
+                fallback="/images/hero-snack-1.jpg"
                 className="object-cover"
               />
             )}
@@ -220,10 +221,11 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
             onError={() => setShowVideo(false)}
           />
         ) : (
-          <Image
+          <SafeImage
             src={product.image}
             alt={product.name}
             fill
+            fallback="/images/hero-snack-1.jpg"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         )}

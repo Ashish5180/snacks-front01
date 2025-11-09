@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
@@ -12,6 +12,7 @@ import { ArrowLeft, CreditCard, Shield, CheckCircle, Loader } from 'lucide-react
 // Truck icon removed - was only used for COD option which we don't need now
 import RazorpayPayment from '../../components/RazorpayPayment'
 import { warmUpBackend } from '../../utils/keepAlive'
+import { buildApiUrl } from '../../utils/api'
 
 const CheckoutPage = () => {
   const { items, getCartTotal, appliedCoupon, removeCoupon, clearCart } = useCart()
@@ -28,16 +29,93 @@ const CheckoutPage = () => {
     pincode: '',
     paymentMethod: 'razorpay' // Default to Razorpay for better user experience
   })
-  const [createdOrder, setCreatedOrder] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
   const [backendReady, setBackendReady] = useState(false)
+  const [warmupStatus, setWarmupStatus] = useState('')
+  const [showWarmupOverlay, setShowWarmupOverlay] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const authCheckedRef = useRef(false)
 
-  // Warm up backend on mount
+  // Protected route - verify authentication and token validity
+  useEffect(() => {
+    // Only check once
+    if (authCheckedRef.current) return
+    authCheckedRef.current = true
+
+    const verifyAuth = async () => {
+      try {
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+          setIsCheckingAuth(false)
+          return
+        }
+
+        const token = localStorage.getItem('token')
+        
+        // Check if token exists
+        if (!token) {
+          addToast('Please login to continue checkout', 'error')
+          router.push('/login?redirect=/checkout')
+          setIsCheckingAuth(false)
+          return
+        }
+
+        // Verify token validity by calling /api/auth/me
+        const response = await fetch(buildApiUrl('/auth/me'), {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        const data = await response.json()
+
+        if (!response.ok || !data.success) {
+          // Token is invalid or expired
+          localStorage.removeItem('token')
+          addToast('Your session has expired. Please login again.', 'error')
+          router.push('/login?redirect=/checkout')
+          setIsCheckingAuth(false)
+          return
+        }
+
+        // Token is valid
+        setIsAuthenticated(true)
+        setIsCheckingAuth(false)
+      } catch (error) {
+        console.error('Auth verification error:', error)
+        // On error, treat as unauthenticated
+        localStorage.removeItem('token')
+        addToast('Authentication failed. Please login again.', 'error')
+        router.push('/login?redirect=/checkout')
+        setIsCheckingAuth(false)
+      }
+    }
+
+    verifyAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Only run once on mount
+
+  // Aggressive backend warmup on mount
   useEffect(() => {
     const warmup = async () => {
-      const isReady = await warmUpBackend()
+      setWarmupStatus('Connecting to server...')
+      
+      const isReady = await warmUpBackend((progress) => {
+        setWarmupStatus(progress)
+      })
+      
       setBackendReady(isReady)
+      
+      if (isReady) {
+        setWarmupStatus('✅ Connected! Ready to place order.')
+        setTimeout(() => setShowWarmupOverlay(false), 1500)
+      } else {
+        setWarmupStatus('⚠️ Server is warming up. Order may take longer.')
+        setTimeout(() => setShowWarmupOverlay(false), 2000)
+      }
     }
     warmup()
   }, [])
@@ -48,6 +126,9 @@ const CheckoutPage = () => {
       return { 'Content-Type': 'application/json' }
     }
     const token = localStorage.getItem('token')
+    if (!token) {
+      throw new Error('No authentication token found')
+    }
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -65,95 +146,7 @@ const CheckoutPage = () => {
     })
   }
 
-  const createOrder = async () => {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      addToast('Please login to place order', 'error')
-      router.push('/login')
-      return null
-    }
-    
-    const token = localStorage.getItem('token')
-    if (!token) {
-      addToast('Please login to place order', 'error')
-      router.push('/login')
-      return null
-    }
-
-    const payload = {
-      items: items.map(i => ({
-        productId: i.id,
-        size: i.selectedSize,
-        quantity: i.quantity
-      })),
-      shippingAddress: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        phone: formData.phone
-      },
-      paymentMethod: formData.paymentMethod,
-      appliedCoupon: appliedCoupon || undefined
-    }
-
-    try {
-      const orderRes = await fetch(`${'https://snacks-back01.onrender.com/api'}/orders`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        headers: getAuthHeaders(),
-        body: JSON.stringify(payload)
-      })
-      
-      const orderData = await orderRes.json()
-      
-      if (!orderRes.ok || !orderData.success) {
-        console.error('Order creation failed:', orderData)
-        // Don't show toast here as it will be handled by the calling function
-        return null
-      }
-
-      return orderData.data.order
-    } catch (error) {
-      console.error('Network error during order creation:', error)
-      return null
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsProcessing(true)
-    
-    try {
-      // Show progress messages
-      if (!backendReady) {
-        setLoadingMessage('Connecting to server...')
-        addToast('Please wait, connecting to server...', 'info')
-      } else {
-        setLoadingMessage('Creating your order...')
-      }
-
-      // For Razorpay, create order first
-      const order = await createOrder()
-      
-      if (order) {
-        setLoadingMessage('Order created! Opening payment gateway...')
-        setCreatedOrder(order)
-      } else {
-        setLoadingMessage('')
-        addToast('Failed to create order. Please try again.', 'error')
-      }
-    } catch (err) {
-      console.error('Order creation error:', err)
-      setLoadingMessage('')
-      addToast('Something went wrong. Please try again.', 'error')
-    } finally {
-      setIsProcessing(false)
-    }
-  }
+  // No pre-order creation; order will be created after successful payment
 
   const handlePaymentSuccess = (paymentResponse) => {
     addToast('Payment successful! Order placed.', 'success')
@@ -164,7 +157,23 @@ const CheckoutPage = () => {
 
   const handlePaymentError = (error) => {
     addToast('Payment failed. Please try again.', 'error')
-    setCreatedOrder(null)
+  }
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-vibe-bg flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="h-12 w-12 text-vibe-cookie animate-spin mx-auto mb-4" />
+          <p className="text-vibe-brown">Verifying authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render checkout if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null
   }
 
   if (items.length === 0) {
@@ -195,6 +204,29 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
       
+      {/* Backend Warmup Overlay */}
+      {showWarmupOverlay && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+            <div className="text-center">
+              <Loader className="h-12 w-12 text-vibe-cookie animate-spin mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-vibe-brown mb-2">
+                Preparing Your Checkout
+              </h3>
+              <p className="text-vibe-brown/70 mb-4">
+                {warmupStatus}
+              </p>
+              <div className="w-full bg-vibe-bg rounded-full h-2 overflow-hidden">
+                <div className="h-full bg-vibe-cookie animate-pulse"></div>
+              </div>
+              <p className="text-sm text-vibe-brown/50 mt-4">
+                First-time connection may take a moment...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -214,7 +246,7 @@ const CheckoutPage = () => {
             {/* Shipping Information */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-xl font-semibold text-vibe-brown mb-6">Shipping Information</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-vibe-brown mb-2">First Name</label>
@@ -406,11 +438,10 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* Place Order Button */}
-              {formData.paymentMethod === 'razorpay' && createdOrder ? (
+              {/* Pay Button (opens Razorpay instantly) */}
+              {formData.paymentMethod === 'razorpay' && (
                 <RazorpayPayment
                   amount={total}
-                  orderId={createdOrder._id}
                   onSuccess={handlePaymentSuccess}
                   onError={handlePaymentError}
                   userInfo={{
@@ -418,32 +449,25 @@ const CheckoutPage = () => {
                     email: formData.email,
                     phone: formData.phone
                   }}
+                  orderPayload={{
+                    items: items.map(i => ({
+                      productId: i.id,
+                      size: i.selectedSize,
+                      quantity: i.quantity
+                    })),
+                    shippingAddress: {
+                      firstName: formData.firstName,
+                      lastName: formData.lastName,
+                      address: formData.address,
+                      city: formData.city,
+                      state: formData.state,
+                      pincode: formData.pincode,
+                      phone: formData.phone
+                    },
+                    paymentMethod: 'razorpay',
+                    appliedCoupon: appliedCoupon || undefined
+                  }}
                 />
-              ) : (
-                <>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isProcessing}
-                    className="w-full inline-flex items-center justify-center px-6 py-3 bg-vibe-cookie text-vibe-brown font-semibold rounded-full hover:bg-vibe-accent transition-colors duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader className="mr-2 h-5 w-5 animate-spin" />
-                        {loadingMessage || 'Processing...'}
-                      </>
-                    ) : (
-                      <>
-                        <Shield className="mr-2 h-5 w-5" />
-                        Place Order
-                      </>
-                    )}
-                  </button>
-                  {!backendReady && !isProcessing && (
-                    <div className="mt-3 text-center text-sm text-yellow-600 bg-yellow-50 p-2 rounded-lg">
-                      ⏱️ Server is warming up... First order may take a moment
-                    </div>
-                  )}
-                </>
               )}
               {/* COD Button - Commented out as we don't need it now */}
               {/* {formData.paymentMethod === 'cod' ? (

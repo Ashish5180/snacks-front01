@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
+import SafeImage from './SafeImage'
 import Link from 'next/link'
 import { ShoppingCart, Star, Heart } from 'lucide-react'
 import { buildApiUrl } from '../utils/api'
@@ -52,10 +52,11 @@ const ProductCard = ({ product }) => {
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
       {/* Product Image */}
       <Link href={`/product/${product._id || product.id}`} className="relative h-64 overflow-hidden block">
-        <Image
+        <SafeImage
           src={product.image}
           alt={product.name}
           fill
+          fallback="/images/hero-snack-1.jpg"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4">

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '../../components/Navbar'
@@ -9,12 +9,22 @@ import CouponInput from '../../components/CouponInput'
 import { useCart } from '../../context/CartContext'
 import { useToast } from '../../components/Toaster'
 import { Trash2, ArrowLeft, ShoppingBag, Plus, Minus } from 'lucide-react'
+import { warmUpBackend } from '../../utils/keepAlive'
 
 const CartPage = () => {
   const { items, removeFromCart, updateQuantity, getCartTotal, appliedCoupon, removeCoupon, shippingFee, freeShippingThreshold, getShippingCost } = useCart()
   const { addToast } = useToast()
   const [couponCode, setCouponCode] = useState('')
 
+  // Pre-warm backend when user is on cart page (preparing for checkout)
+  useEffect(() => {
+    if (items.length > 0) {
+      // Silently warm up backend in background
+      warmUpBackend().then((isReady) => {
+        console.log('[Cart] Backend warmup:', isReady ? 'Ready' : 'Still warming')
+      })
+    }
+  }, [items.length])
 
   const handleQuantityChange = (id, selectedSize, newQuantity) => {
     if (newQuantity <= 0) {

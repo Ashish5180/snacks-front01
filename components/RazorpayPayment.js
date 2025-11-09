@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useToast } from './Toaster'
 
-const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
+const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload }) => {
   const [razorpayLoaded, setRazorpayLoaded] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [verifying, setVerifying] = useState(false)
@@ -17,6 +17,9 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
       return { 'Content-Type': 'application/json' }
     }
     const token = localStorage.getItem('token')
+    if (!token) {
+      throw new Error('No authentication token found')
+    }
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -63,7 +66,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
 
   // Preload Razorpay key and order when component mounts
   useEffect(() => {
-    if (!razorpayLoaded || !orderId || razorpayKeyRef.current) return
+    if (!razorpayLoaded || razorpayKeyRef.current) return
 
     const preloadPaymentData = async () => {
       try {
@@ -84,7 +87,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
           body: JSON.stringify({
             amount: amount,
             currency: 'INR',
-            orderId: orderId
+            // Do not pass our internal orderId; backend accepts optional and will create receipt itself
           })
         })
 
@@ -99,7 +102,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
     }
 
     preloadPaymentData()
-  }, [razorpayLoaded, orderId, amount])
+  }, [razorpayLoaded, amount])
 
   const handlePayment = useCallback(async () => {
     // Immediate feedback
@@ -113,12 +116,6 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
 
     if (!amount || amount <= 0) {
       addToast('Invalid payment amount', 'error')
-      setIsProcessing(false)
-      return
-    }
-
-    if (!orderId) {
-      addToast('Order ID is missing', 'error')
       setIsProcessing(false)
       return
     }
@@ -148,7 +145,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
           body: JSON.stringify({
             amount: amount,
             currency: 'INR',
-            orderId: orderId
+            // No internal orderId pre-creation
           })
         })
 
@@ -204,8 +201,35 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
             const verifyData = await verifyRes.json()
             
             if (verifyRes.ok && verifyData.success) {
-              addToast('Payment successful! Order confirmed.', 'success')
-              onSuccess(response)
+              // After payment verification, create the internal order
+              try {
+                const createRes = await fetch(`https://snacks-back01.onrender.com/api/orders`, {
+                  method: 'POST',
+                  headers: getAuthHeaders(),
+                  body: JSON.stringify({
+                    ...orderPayload,
+                    paymentMethod: 'razorpay',
+                    razorpay: {
+                      orderId: response.razorpay_order_id,
+                      paymentId: response.razorpay_payment_id,
+                      signature: response.razorpay_signature
+                    }
+                  })
+                })
+                const createData = await createRes.json()
+                if (createRes.ok && createData.success) {
+                  addToast('Payment successful! Order placed.', 'success')
+                  onSuccess({ payment: response, order: createData.data.order })
+                } else {
+                  console.error('Order creation after payment failed:', createData)
+                  addToast('Payment done but order creation failed. Contact support.', 'error')
+                  onError(createData)
+                }
+              } catch (orderErr) {
+                console.error('Post-payment order creation error:', orderErr)
+                addToast('Payment done but order creation failed. Contact support.', 'error')
+                onError(orderErr)
+              }
             } else {
               console.error('Payment verification failed:', verifyData)
               throw new Error(verifyData.message || 'Payment verification failed')
@@ -245,7 +269,7 @@ const RazorpayPayment = ({ amount, orderId, onSuccess, onError, userInfo }) => {
       addToast(error.message || 'Payment failed', 'error')
       onError(error)
     }
-  }, [razorpayLoaded, amount, orderId, userInfo, onSuccess, onError, addToast])
+  }, [razorpayLoaded, amount, userInfo, onSuccess, onError, addToast])
 
   return (
     <div className="relative">
