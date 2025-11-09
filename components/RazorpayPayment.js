@@ -269,7 +269,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
       addToast(error.message || 'Payment failed', 'error')
       onError(error)
     }
-  }, [razorpayLoaded, amount, userInfo, onSuccess, onError, addToast])
+  }, [razorpayLoaded, amount, userInfo, orderPayload, onSuccess, onError, addToast])
 
   return (
     <div className="relative">

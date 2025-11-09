@@ -22,7 +22,8 @@ const SafeImage = ({
       setImgSrc(src)
       setHasError(false)
     }
-  }, [src])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [src]) // Only depend on src to avoid infinite loops
 
   const handleError = () => {
     if (!hasError && imgSrc !== fallback) {
