@@ -36,7 +36,8 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="pt-20">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Hero Section */}
         <div className="text-center mb-10 sm:mb-16">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-vibe-brown mb-6">
@@ -260,6 +261,7 @@ export default function ContactPage() {
             </div>
           </div>
         </div> */}
+        </div>
       </div>
 
       <Footer />

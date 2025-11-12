@@ -95,7 +95,15 @@ client/
 
 ## 🐛 Recent Fixes
 
-### Payment Gateway & Backend Optimization (Latest - November 2025)
+### UI Consistency & Fixed Navbar Layout (Latest - November 2025)
+- **Fixed Navbar Overlap Issue**: Added consistent `pt-20` padding to all pages to prevent content from being hidden behind fixed navbar
+- **Pages Fixed**: Profile, Wishlist, Contact, Checkout, Track Order, About, and all policy pages (Privacy, Terms, Shipping, Return, Cancellation)
+- **Product Detail Error State**: Fixed error state to also have proper navbar spacing
+- **Consistent Layout**: Now all pages have uniform spacing from the fixed navbar
+- **Smart Implementation**: Wrapper div approach maintains existing page structure while fixing overlap
+- **Enhanced UX**: Headers and content no longer go behind the navbar on any page
+
+### Payment Gateway & Backend Optimization (November 2025)
 - **Razorpay Script Preloading**: Moved Razorpay script loading to layout level using Next.js Script component with `afterInteractive` strategy
 - **Backend Keep-Alive System**: Implemented automatic health-check pinging every 5 minutes to prevent Render.com cold starts
 - **Aggressive Multi-Attempt Warmup**: 3-attempt retry system with 15-second timeout per attempt (45s total) to reliably wake backend

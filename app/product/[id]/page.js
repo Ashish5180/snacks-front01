@@ -228,7 +228,8 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-vibe-bg">
         <Navbar />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="pt-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-vibe-brown mb-4">Product Not Found</h1>
             <p className="text-lg text-vibe-brown/70 mb-8">
@@ -241,6 +242,7 @@ export default function ProductDetailPage() {
               <ArrowLeft className="mr-2 h-5 w-5" />
               Back to Products
             </Link>
+          </div>
           </div>
         </div>
         <Footer />

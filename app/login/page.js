@@ -44,25 +44,26 @@ const LoginPage = () => {
       const data = await response.json().catch(() => ({}))
 
       if (response.ok && data.success) {
-        addToast(
-          isRegistering
-            ? 'Registration successful! Please check your email for verification.'
-            : 'Login successful!',
-          'success'
-        )
-        
-        // Store user data in localStorage for profile access
+        // Store user data and token immediately
         if (data.data && data.data.user && typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
           localStorage.setItem('user', JSON.stringify(data.data.user))
-          // If token is provided in response, store it too
+          // Store token for authentication
           if (data.token) {
             localStorage.setItem('token', data.token)
           }
         }
         
-        // Redirect based on user role
-        if (data.data.user.role === 'admin') router.push('/admin')
-        else router.push('/')
+        // Show success message
+        addToast(
+          isRegistering
+            ? 'Account created successfully! Welcome to VIBE BITES!'
+            : 'Login successful!',
+          'success'
+        )
+        
+        // Redirect immediately based on user role
+        const redirectPath = data.data.user.role === 'admin' ? '/admin' : '/'
+        router.push(redirectPath)
       } else {
         // Improved error surfacing
         if (data?.errors?.length) {
@@ -95,7 +96,14 @@ const LoginPage = () => {
 
   const toggleMode = () => {
     setIsRegistering(!isRegistering)
-    setFormData({ email: '', password: '' })
+    // Clear all form data when toggling to prevent "user exists" issues
+    setFormData({ 
+      email: '', 
+      password: '',
+      firstName: '',
+      lastName: '',
+      phone: ''
+    })
   }
 
   return (

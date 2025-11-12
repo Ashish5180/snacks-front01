@@ -11,7 +11,8 @@ export default function TermsConditionsPage() {
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm text-vibe-brown/60">
@@ -285,6 +286,7 @@ export default function TermsConditionsPage() {
             <ArrowLeft className="mr-2 h-5 w-5" />
             Back to Home
           </Link>
+        </div>
         </div>
       </div>
 

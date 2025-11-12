@@ -11,7 +11,8 @@ export default function AboutPage() {
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-vibe-brown mb-6">
@@ -176,6 +177,7 @@ export default function AboutPage() {
               <div className="text-vibe-brown/70">Natural Products</div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

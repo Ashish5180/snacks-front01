@@ -98,7 +98,8 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-vibe-bg">
       <Navbar />
-    <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="pt-20">
+        <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         <h1 className="text-3xl font-bold text-vibe-brown mb-6">My Profile</h1>
         {loading ? (
           <div className="text-vibe-brown/70">Loading...</div>
@@ -188,6 +189,7 @@ const ProfilePage = () => {
         ) : (
           <div className="text-vibe-brown/70">Unable to load profile</div>
         )}
+        </div>
       </div>
       <Footer />
     </div>
