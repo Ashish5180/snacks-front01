@@ -84,23 +84,7 @@ const CouponInput = () => {
           </button>
         </div>
       )}
-
-      {/* Available Coupons */}
-      <div className="mt-3">
-        <p className="text-xs text-vibe-brown/60 mb-2">Available coupons:</p>
-        <div className="space-y-1">
-          {availableCoupons.length === 0 && (
-            <div className="text-xs text-vibe-brown/70">No coupons available</div>
-          )}
-          {availableCoupons.map(coupon => (
-            <div key={coupon._id} className="text-xs text-vibe-brown/70">
-              <span className="font-medium">{coupon.code}</span>
-              {coupon.description ? ` - ${coupon.description}` : ''}
-              {coupon.minOrderAmount > 0 ? ` (Min order: ₹${coupon.minOrderAmount})` : ''}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Available coupons list intentionally hidden in UI as per requirement */}
     </div>
   )
 }
