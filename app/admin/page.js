@@ -654,9 +654,10 @@ Verified: ${review.verified ? 'Yes' : 'No'}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-white rounded-lg p-1 shadow-sm mb-8">
+        <div className="bg-white rounded-lg p-1 shadow-sm mb-8">
+          <div className="flex space-x-1 justify-center flex-wrap gap-1">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
             { id: 'users', label: 'Users', icon: Users },
@@ -665,6 +666,7 @@ Verified: ${review.verified ? 'Yes' : 'No'}
             { id: 'coupons', label: 'Coupons', icon: TrendingUp },
             { id: 'reviews', label: 'Reviews', icon: Eye },
             { id: 'categories', label: 'Categories', icon: Plus },
+            { id: 'announcements', label: 'Announcements', icon: AlertCircle },
             { id: 'settings', label: 'Settings', icon: Settings }
           ].map((tab) => {
             const Icon = tab.icon
@@ -673,10 +675,22 @@ Verified: ${review.verified ? 'Yes' : 'No'}
                 <button
                   key={tab.id}
                   onClick={() => router.push('/admin/addcategory')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors text-vibe-brown hover:bg-gray-100`}
+                  className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md transition-colors text-vibe-brown hover:bg-gray-100 whitespace-nowrap`}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span>{tab.label}</span>
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">{tab.label}</span>
+                </button>
+              )
+            }
+            if (tab.id === 'announcements') {
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => router.push('/admin/announcements')}
+                  className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md transition-colors text-vibe-brown hover:bg-gray-100 whitespace-nowrap`}
+                >
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm">{tab.label}</span>
                 </button>
               )
             }
@@ -689,25 +703,26 @@ Verified: ${review.verified ? 'Yes' : 'No'}
                   setSearchQuery('')
                   setFilterStatus('')
                 }}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-vibe-cookie text-vibe-brown'
                     : 'text-vibe-brown hover:bg-gray-100'
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span>{tab.label}</span>
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                <span className="text-xs sm:text-sm">{tab.label}</span>
               </button>
             )
           })}
+          </div>
         </div>
         {/* Settings Tab - Shipping Settings Management */}
         {activeTab === 'settings' && (
-          <div className="space-y-6 max-w-2xl mx-auto">
+          <div className="space-y-6 w-full">
             <h2 className="text-2xl font-bold text-vibe-brown mb-4">Store Settings</h2>
             
             {/* Shipping Settings */}
-            <div className="bg-white rounded-lg shadow-sm border border-vibe-cookie p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-vibe-cookie p-6 overflow-hidden">
               <h3 className="text-lg font-semibold text-vibe-brown mb-4">Shipping Settings</h3>
               
               <div className="space-y-4">
@@ -773,6 +788,31 @@ Verified: ${review.verified ? 'Yes' : 'No'}
             <div className="bg-white rounded-lg shadow-sm border border-vibe-cookie p-6">
               <h3 className="text-lg font-semibold text-vibe-brown mb-4">Homepage Banners</h3>
               <p className="text-sm text-vibe-brown/70 mb-4">Upload banner images and configure their content. Changes will be visible on the homepage immediately after saving.</p>
+              
+              {/* Image Specifications Guide */}
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg overflow-hidden">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center flex-wrap">
+                  <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  📸 Image Specifications for Best Results
+                </h4>
+                <div className="text-sm text-blue-800 space-y-1 break-words">
+                  <p><strong>✅ Recommended Dimensions:</strong> 1920×600px (Desktop) or 1920×800px (Wider view)</p>
+                  <p><strong>✅ Aspect Ratio:</strong> 16:9 or 21:9 (Landscape orientation)</p>
+                  <p><strong>✅ File Format:</strong> JPG or PNG (JPG preferred for faster loading)</p>
+                  <p><strong>✅ File Size:</strong> Under 500KB (Compress images for better performance)</p>
+                  <p><strong>✅ Resolution:</strong> High quality (72-150 DPI for web)</p>
+                  <p><strong>⚠️ Important Tips:</strong></p>
+                  <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                    <li className="break-words">Use bright, vibrant images with good contrast</li>
+                    <li className="break-words">Avoid images that are too dark or have heavy shadows</li>
+                    <li className="break-words">Keep important content (products/text) in the center</li>
+                    <li className="break-words">Test on mobile - banner will be cropped on smaller screens</li>
+                    <li className="break-words">White text works best, so avoid very light backgrounds in center area</li>
+                  </ul>
+                </div>
+              </div>
               {[0,1,2].map((i) => (
                 <div key={i} className="mb-6 p-4 border border-vibe-cookie rounded-lg">
                   <h4 className="text-md font-medium text-vibe-brown mb-3">Banner #{i+1}</h4>

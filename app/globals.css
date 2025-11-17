@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Marquee animation for announcement strip */
+.marquee {
+  animation: marquee 22s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 * {
   box-sizing: border-box;
   padding: 0;

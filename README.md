@@ -93,9 +93,40 @@ client/
 └── tailwind.config.js    # Tailwind configuration
 ```
 
+## 📸 Hero Banner Image Specifications
+
+For optimal display on the homepage hero carousel, admin should upload images with the following specifications:
+
+### ✅ Recommended Specifications
+- **Dimensions**: 1920×600px (Standard) or 1920×800px (Wider view)
+- **Aspect Ratio**: 16:9 or 21:9 (Landscape orientation)
+- **File Format**: JPG (preferred) or PNG
+- **File Size**: Under 500KB (compress for faster loading)
+- **Resolution**: 72-150 DPI (web optimized)
+
+### ⚠️ Important Guidelines
+- **Use bright, vibrant images** with good contrast
+- **Avoid dark images** or heavy shadows (gradient overlay is applied for text readability)
+- **Keep important content centered** - edges may be cropped on mobile
+- **Test on mobile devices** - banner height adjusts responsively
+- **White text overlay** is used, so avoid very light backgrounds in the center area
+- **Product focus**: Show snacks/products prominently in the frame
+
+### 📱 Responsive Behavior
+- **Desktop**: 600px height (full width)
+- **Tablet**: 500px height
+- **Mobile**: 400px height
+- Images use `object-fit: cover` to maintain aspect ratio across all devices
+
 ## 🐛 Recent Fixes
 
-### UI Consistency & Fixed Navbar Layout (Latest - November 2025)
+### Hero Banner Visual Enhancement (Latest - November 2025)
+- **Removed Harsh Blackish Effect**: Eliminated `brightness(0.5)` filter that was making images too dark
+- **Subtle Gradient Overlay**: Replaced flat dark overlay with elegant gradient (20% → 30% → 40% from top to bottom)
+- **Enhanced Text Readability**: Added drop shadows to text for better visibility on any background
+- **Result**: Images now appear vibrant and natural while maintaining excellent text readability
+
+### UI Consistency & Fixed Navbar Layout (November 2025)
 - **Fixed Navbar Overlap Issue**: Added consistent `pt-20` padding to all pages to prevent content from being hidden behind fixed navbar
 - **Pages Fixed**: Profile, Wishlist, Contact, Checkout, Track Order, About, and all policy pages (Privacy, Terms, Shipping, Return, Cancellation)
 - **Product Detail Error State**: Fixed error state to also have proper navbar spacing

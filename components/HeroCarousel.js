@@ -97,14 +97,17 @@ const HeroCarousel = () => {
                 src={slide.image}
                 alt={slide.title}
                 fill
-                style={{ objectFit: 'cover', filter: 'brightness(0.5)' }}
+                style={{ objectFit: 'cover' }}
                 priority={slide.id === 1}
                 className="w-full h-full"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center text-center text-white px-4 pt-20">
+              {/* Subtle gradient overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/40"></div>
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4 pt-20">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">{slide.title}</h2>
-                  <p className="text-base sm:text-lg md:text-xl mb-6 max-w-2xl mx-auto">{slide.subtitle}</p>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{slide.title}</h2>
+                  <p className="text-base sm:text-lg md:text-xl mb-6 max-w-2xl mx-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">{slide.subtitle}</p>
                   <Link href={slide.link}>
                     <button className="bg-[#D9A066] hover:bg-[#c48841] transition-all duration-300 px-6 py-3 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
                       {slide.button}
