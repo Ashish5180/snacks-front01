@@ -8,19 +8,22 @@ import Footer from '../components/Footer'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-vibe-bg">
+    <main className="min-h-screen bg-vibe-bg overflow-x-hidden">
       <Navbar />
       {/* Offset content from fixed navbar for clear visibility */}
       <div className="pt-24">
+        {/* Announcement Strip - Completely separate section */}
         <AnnouncementStrip />
-        <div className="relative">
+        {/* Hero Section - Completely separate section with its own space */}
+        <div className="relative w-full">
           <HeroCarousel />
-          <div className="-mt-4">
-            <CategorySection />
-            <FeaturedProducts />
-            <WhyChooseUs />
-            <Footer />
-          </div>
+        </div>
+        {/* Rest of the content */}
+        <div className="relative">
+          <CategorySection />
+          <FeaturedProducts />
+          <WhyChooseUs />
+          <Footer />
         </div>
       </div>
     </main>

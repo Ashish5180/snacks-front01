@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import SafeImage from './SafeImage'
 import Link from 'next/link'
 import { ShoppingCart, Heart, Star, Play } from 'lucide-react'
@@ -12,6 +12,8 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]?.size || '')
   const [quantity, setQuantity] = useState(1)
   const [showVideo, setShowVideo] = useState(false)
+  const [carouselIdx, setCarouselIdx] = useState(0)
+  const autoPlayRef = useRef(null)
   const selectedSizeObj = product.sizes.find(size => size.size === selectedSize) || {}
   const maxStock = selectedSizeObj.stock ?? 99
   const { addToCart } = useCart()
@@ -20,6 +22,30 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
   
   // Check if product is in wishlist
   const isInWishlist = wishlistItems.some(item => item.id === product.id)
+
+  // Get all product images
+  const allImages = product.images && Array.isArray(product.images) && product.images.length > 0
+    ? product.images.filter(img => img && img.trim())
+    : product.image 
+      ? [product.image]
+      : ['/images/hero-snack-1.jpg']
+  
+  const totalImages = allImages.length
+
+  // Auto-play carousel
+  useEffect(() => {
+    if (totalImages <= 1 || showVideo) return
+
+    autoPlayRef.current = setInterval(() => {
+      setCarouselIdx((prev) => (prev + 1) % totalImages)
+    }, 3000) // Change image every 3 seconds
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current)
+      }
+    }
+  }, [totalImages, showVideo])
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -73,13 +99,31 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
                 onError={() => setShowVideo(false)}
               />
             ) : (
-              <SafeImage
-                src={product.image}
+              <div className="relative w-full h-full bg-transparent">
+                <SafeImage
+                  src={allImages[carouselIdx]}
                 alt={product.name}
                 fill
-                fallback="/images/hero-snack-1.jpg"
-                className="object-cover"
-              />
+                  fallback="/images/hero-snack-1.jpg"
+                  className="object-cover transition-opacity duration-500"
+                  style={{ backgroundColor: 'transparent' }}
+                />
+                {/* Carousel Indicators */}
+                {totalImages > 1 && (
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {allImages.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          carouselIdx === idx 
+                            ? 'bg-white w-4' 
+                            : 'bg-white/50 w-1.5'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
             <div className="absolute top-4 right-4">
               <button 
@@ -221,13 +265,31 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
             onError={() => setShowVideo(false)}
           />
         ) : (
-          <SafeImage
-            src={product.image}
+          <div className="relative w-full h-full bg-transparent">
+            <SafeImage
+              src={allImages[carouselIdx]}
             alt={product.name}
             fill
-            fallback="/images/hero-snack-1.jpg"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+              fallback="/images/hero-snack-1.jpg"
+              className="object-cover group-hover:scale-105 transition-all duration-500"
+              style={{ backgroundColor: 'transparent' }}
+            />
+            {/* Carousel Indicators */}
+            {totalImages > 1 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {allImages.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      carouselIdx === idx 
+                        ? 'bg-white w-4' 
+                        : 'bg-white/50 w-1.5'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         )}
         <div className="absolute top-4 right-4">
           <button 

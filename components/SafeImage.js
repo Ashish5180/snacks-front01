@@ -46,6 +46,7 @@ const SafeImage = ({
         onError={handleError}
         unoptimized={isExternal}
         priority={false}
+        style={{ backgroundColor: 'transparent', ...props.style }}
         {...props}
       />
     )
@@ -61,6 +62,7 @@ const SafeImage = ({
       onError={handleError}
       unoptimized={isExternal}
       priority={false}
+      style={{ backgroundColor: 'transparent', ...props.style }}
       {...props}
     />
   )

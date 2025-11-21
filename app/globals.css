@@ -58,3 +58,42 @@ a {
 ::-webkit-scrollbar-thumb:hover {
   background: #5A3B1C;
 }
+
+/* Hero Carousel - Remove default backgrounds and spacing */
+.hero-carousel {
+  background: transparent !important;
+}
+
+.hero-carousel .carousel-slider {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-carousel .slider-wrapper {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-carousel .slider {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-carousel .slide {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-carousel .control-dots {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.hero-carousel .control-arrow {
+  background: transparent !important;
+}

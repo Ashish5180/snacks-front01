@@ -50,7 +50,7 @@ const AnnouncementStrip = () => {
   return (
     <div className="bg-vibe-brown text-vibe-bg border-b border-vibe-cookie/30">
       <div className="max-w-7xl mx-auto overflow-hidden">
-        <div className="marquee whitespace-nowrap pt-3 pb-5 sm:pt-3 sm:pb-6 text-xs sm:text-sm md:text-base tracking-[0.3em] font-semibold uppercase">
+        <div className="marquee whitespace-nowrap pt-5 pb-5 sm:pt-6 sm:pb-6 md:pt-7 md:pb-7 text-sm sm:text-base md:text-lg lg:text-xl tracking-[0.3em] font-semibold uppercase">
           <span className="inline-block mr-20 opacity-90">{currentMessage}</span>
           <span className="inline-block mr-20 opacity-80">{currentMessage}</span>
           <span className="inline-block mr-20 opacity-70">{currentMessage}</span>

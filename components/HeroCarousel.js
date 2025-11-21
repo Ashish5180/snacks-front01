@@ -57,9 +57,9 @@ const HeroCarousel = () => {
   }, []);
 
   return (
-    <div className="w-full bg-[#FFF8ED] -mt-4 -mb-4">
+    <div className="w-screen relative overflow-hidden bg-transparent" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
       {loading ? (
-        <div className="h-[400px] sm:h-[500px] lg:h-[600px] flex items-center justify-center pt-20">
+        <div className="h-[400px] sm:h-[500px] md:h-[600px] lg:h-screen flex items-center justify-center bg-transparent">
           <div className="text-vibe-brown text-lg">Loading banners...</div>
         </div>
       ) : (
@@ -72,7 +72,7 @@ const HeroCarousel = () => {
           transitionTime={900}
           swipeable
           emulateTouch
-          className="w-full"
+          className="w-full hero-carousel"
           showArrows={true}
           showIndicators={true}
           renderIndicator={(onClickHandler, isSelected, index, label) => {
@@ -92,22 +92,27 @@ const HeroCarousel = () => {
           }}
         >
           {slides.map((slide) => (
-            <div key={slide.id} className="relative h-[400px] sm:h-[500px] lg:h-[600px] w-full">
+            <div key={slide.id} className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-screen bg-transparent m-0 p-0">
               <Image
                 src={slide.image}
                 alt={slide.title}
                 fill
-                style={{ objectFit: 'cover' }}
+                style={{ 
+                  objectFit: 'cover',
+                  objectPosition: 'center center',
+                  backgroundColor: 'transparent'
+                }}
                 priority={slide.id === 1}
                 className="w-full h-full"
+                sizes="100vw"
               />
               {/* Subtle gradient overlay for text readability */}
               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/40"></div>
               
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4 pt-20">
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4">
                 <div className="max-w-4xl mx-auto">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{slide.title}</h2>
-                  <p className="text-base sm:text-lg md:text-xl mb-6 max-w-2xl mx-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">{slide.subtitle}</p>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">{slide.title}</h2>
+                  <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 max-w-2xl mx-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">{slide.subtitle}</p>
                   <Link href={slide.link}>
                     <button className="bg-[#D9A066] hover:bg-[#c48841] transition-all duration-300 px-6 py-3 rounded-full text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
                       {slide.button}

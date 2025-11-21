@@ -79,6 +79,27 @@ const AdminPage = () => {
   // Memoize API base URL to prevent recreation - MUST be declared before functions that use it
   const API_BASE_URL = useMemo(() => 'https://snacks-back01.onrender.com/api', [])
 
+  // Helper function for fetch with timeout
+  const fetchWithTimeout = useCallback(async (url, options = {}, timeout = 30000) => {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      })
+      clearTimeout(timeoutId)
+      return response
+    } catch (error) {
+      clearTimeout(timeoutId)
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout - please try again')
+      }
+      throw error
+    }
+  }, [])
+
   // Helper function to get auth headers - memoized to prevent recreation
   const getAuthHeaders = useCallback(() => {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined' || !isClient) {
@@ -107,10 +128,10 @@ const AdminPage = () => {
   const fetchShippingSettings = useCallback(async () => {
     setIsShippingFeeLoading(true)
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/shipping-fee?_=${Date.now()}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/shipping-fee?_=${Date.now()}`, {
         headers: getAuthHeaders(),
         cache: 'no-store'
-      })
+      }, 15000)
       if (response.ok) {
         const data = await response.json()
         setShippingFee(data.shippingFee)
@@ -121,24 +142,27 @@ const AdminPage = () => {
         addToast('Failed to fetch shipping settings', 'error')
       }
     } catch (error) {
-      addToast('Error fetching shipping settings', 'error')
+      const errorMessage = error.message?.includes('timeout') 
+        ? 'Request timeout - please try again' 
+        : 'Error fetching shipping settings'
+      addToast(errorMessage, 'error')
     } finally {
       setIsShippingFeeLoading(false)
     }
-  }, [API_BASE_URL, getAuthHeaders, addToast])
+  }, [API_BASE_URL, getAuthHeaders, addToast, fetchWithTimeout])
 
   // Update shipping settings
   const updateShippingSettings = async () => {
     setIsShippingFeeLoading(true)
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/shipping-fee`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/shipping-fee`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ 
           shippingFee: Number(shippingFeeInput),
           freeShippingThreshold: Number(freeShippingThresholdInput)
         })
-      })
+      }, 15000)
       if (response.ok) {
         const data = await response.json()
         setShippingFee(data.shippingFee)
@@ -165,11 +189,11 @@ const AdminPage = () => {
     try {
       const fd = new FormData()
       fd.append('image', file)
-      const response = await fetch(`${API_BASE_URL}/uploads/banner`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/uploads/banner`, {
         method: 'POST',
         headers: getFileUploadHeaders(),
         body: fd
-      })
+      }, 60000) // 60 seconds for file upload
       const data = await response.json()
       if (response.ok && data.success) {
         setBannerUrls(prev => {
@@ -199,11 +223,11 @@ const AdminPage = () => {
         link: bannerConfigs[index].link
       }));
 
-      const response = await fetch(`${API_BASE_URL}/admin/banners`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/banners`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ banners })
-      });
+      }, 15000);
 
       const data = await response.json();
       if (response.ok && data.success) {
@@ -228,9 +252,9 @@ const AdminPage = () => {
     setIsDashboardLoading(true);
     try {
       console.log('Loading dashboard stats...');
-      const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/dashboard`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       console.log('Dashboard response status:', response.status);
       
@@ -250,11 +274,14 @@ const AdminPage = () => {
       }
     } catch (error) {
       console.error('Error loading dashboard stats:', error)
-      addToast('Error loading dashboard data', 'error')
+      const errorMessage = error.message?.includes('timeout') 
+        ? 'Request timeout - please try again' 
+        : 'Error loading dashboard data'
+      addToast(errorMessage, 'error')
     } finally {
       setIsDashboardLoading(false);
     }
-  }, [addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   const loadUsers = useCallback(async () => {
     if (!isClient) return;
@@ -267,9 +294,9 @@ const AdminPage = () => {
         status: filterStatus
       })
 
-      const response = await fetch(`${API_BASE_URL}/admin/users?${params}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/users?${params}`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       if (response.ok) {
         const data = await response.json()
@@ -280,7 +307,7 @@ const AdminPage = () => {
       console.error('Error loading users:', error)
       addToast('Error loading users', 'error')
     }
-  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   const loadProducts = useCallback(async () => {
     if (!isClient) return;
@@ -293,9 +320,9 @@ const AdminPage = () => {
         status: filterStatus
       })
 
-      const response = await fetch(`${API_BASE_URL}/admin/products?${params}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/products?${params}`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       if (response.ok) {
         const data = await response.json()
@@ -306,7 +333,7 @@ const AdminPage = () => {
       console.error('Error loading products:', error)
       addToast('Error loading products', 'error')
     }
-  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   const loadOrders = useCallback(async () => {
     if (!isClient) return;
@@ -321,9 +348,9 @@ const AdminPage = () => {
         status: statusParam
       })
 
-      const response = await fetch(`${API_BASE_URL}/admin/orders?${params}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/orders?${params}`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       if (response.ok) {
         const data = await response.json()
@@ -336,7 +363,7 @@ const AdminPage = () => {
       console.error('Error loading orders:', error)
       addToast('Error loading orders', 'error')
     }
-  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [currentPage, searchQuery, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   const loadCoupons = useCallback(async () => {
     if (!isClient) return;
@@ -348,9 +375,9 @@ const AdminPage = () => {
         status: filterStatus
       })
 
-      const response = await fetch(`${API_BASE_URL}/admin/coupons?${params}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/coupons?${params}`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       if (response.ok) {
         const data = await response.json()
@@ -361,7 +388,7 @@ const AdminPage = () => {
       console.error('Error loading coupons:', error)
       addToast('Error loading coupons', 'error')
     }
-  }, [currentPage, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [currentPage, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   const loadReviews = useCallback(async () => {
     if (!isClient) return;
@@ -373,9 +400,9 @@ const AdminPage = () => {
         status: filterStatus
       })
 
-      const response = await fetch(`${API_BASE_URL}/reviews/admin?${params}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/reviews/admin?${params}`, {
         headers: getAuthHeaders()
-      })
+      }, 20000)
 
       if (response.ok) {
         const data = await response.json()
@@ -386,7 +413,7 @@ const AdminPage = () => {
       console.error('Error loading reviews:', error)
       addToast('Error loading reviews', 'error')
     }
-  }, [currentPage, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL])
+  }, [currentPage, filterStatus, addToast, getAuthHeaders, isClient, API_BASE_URL, fetchWithTimeout])
 
   // Authentication check effect
   useEffect(() => {
@@ -406,12 +433,12 @@ const AdminPage = () => {
           return
         }
 
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
-        })
+        }, 15000)
         
         if (!response.ok) {
           // Token might be expired, clear it and redirect to login
@@ -447,7 +474,7 @@ const AdminPage = () => {
       }
     }
     checkAuth()
-  }, [isClient, router, addToast, API_BASE_URL])
+  }, [isClient, router, addToast, API_BASE_URL, fetchWithTimeout])
 
   // Load dashboard data effect
   useEffect(() => {
@@ -494,11 +521,11 @@ const AdminPage = () => {
 
   const handleUserStatusToggle = async (userId, currentStatus) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/users/${userId}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ isActive: !currentStatus })
-      })
+      }, 15000)
 
       if (response.ok) {
         addToast(`User ${!currentStatus ? 'activated' : 'deactivated'} successfully`, 'success')
@@ -514,11 +541,11 @@ const AdminPage = () => {
 
   const handleOrderStatusUpdate = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/orders/${orderId}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ status: newStatus })
-      })
+      }, 15000)
 
       if (response.ok) {
         addToast('Order status updated successfully', 'success')
@@ -535,11 +562,11 @@ const AdminPage = () => {
 
   const handleReviewStatusToggle = async (reviewId, isActive) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/reviews/admin/${reviewId}/status`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/reviews/admin/${reviewId}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify({ isActive })
-      })
+      }, 15000)
 
       if (response.ok) {
         addToast(`Review ${isActive ? 'activated' : 'deactivated'} successfully`, 'success')
@@ -574,10 +601,10 @@ Verified: ${review.verified ? 'Yes' : 'No'}
     if (!confirm(`Are you sure you want to delete this ${type}?`)) return
 
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/${type}/${id}`, {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/admin/${type}/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
-      })
+      }, 15000)
 
       if (response.ok) {
         addToast(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`, 'success')
