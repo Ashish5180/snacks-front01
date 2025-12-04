@@ -63,7 +63,7 @@ const CategorySection = () => {
           // Handle image URLs - convert relative paths to full URLs
           let image = cat.image || '/images/hero-snack-1.jpg';
           if (image && image.startsWith('/uploads/')) {
-            image = `https://snacks-back01.onrender.com${image}`;
+            image = `https://snacks-back01-production.up.railway.app${image}`;
           }
           return { ...cat, image };
         });

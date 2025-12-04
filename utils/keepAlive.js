@@ -1,5 +1,5 @@
 // Keep backend alive by pinging health endpoint
-const BACKEND_URL = 'https://snacks-back01.onrender.com'
+const BACKEND_URL = 'https://snacks-back01-production.up.railway.app'
 const PING_INTERVAL = 5 * 60 * 1000 // 5 minutes
 
 let pingTimer = null
