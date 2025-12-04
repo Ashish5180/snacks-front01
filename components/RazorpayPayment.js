@@ -71,7 +71,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
     const preloadPaymentData = async () => {
       try {
         // Fetch Razorpay key
-        const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
+        const keyRes = await fetch(`https://snacks-back01-production.up.railway.app/api/payments/razorpay/keys`, {
           headers: getAuthHeaders()
         })
         const keyData = await keyRes.json()
@@ -81,7 +81,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
         }
 
         // Prefetch and cache the order
-        const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
+        const orderRes = await fetch(`https://snacks-back01-production.up.railway.app/api/payments/razorpay/create-order`, {
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify({
@@ -124,7 +124,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
       // Use cached key or fetch if not available
       let razorpayKey = razorpayKeyRef.current
       if (!razorpayKey) {
-        const keyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/keys`, {
+        const keyRes = await fetch(`https://snacks-back01-production.up.railway.app/api/payments/razorpay/keys`, {
           headers: getAuthHeaders()
         })
         const keyData = await keyRes.json()
@@ -139,7 +139,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
       // Use cached order or create new one
       let orderData = razorpayOrderRef.current
       if (!orderData) {
-        const orderRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/create-order`, {
+        const orderRes = await fetch(`https://snacks-back01-production.up.railway.app/api/payments/razorpay/create-order`, {
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify({
@@ -188,7 +188,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
           try {
             setVerifying(true)
             // Verify payment
-            const verifyRes = await fetch(`https://snacks-back01.onrender.com/api/payments/razorpay/verify`, {
+            const verifyRes = await fetch(`https://snacks-back01-production.up.railway.app/api/payments/razorpay/verify`, {
               method: 'POST',
               headers: getAuthHeaders(),
               body: JSON.stringify({
@@ -203,7 +203,7 @@ const RazorpayPayment = ({ amount, onSuccess, onError, userInfo, orderPayload })
             if (verifyRes.ok && verifyData.success) {
               // After payment verification, create the internal order
               try {
-                const createRes = await fetch(`https://snacks-back01.onrender.com/api/orders`, {
+                const createRes = await fetch(`https://snacks-back01-production.up.railway.app/api/orders`, {
                   method: 'POST',
                   headers: getAuthHeaders(),
                   body: JSON.stringify({

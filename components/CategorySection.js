@@ -56,7 +56,7 @@ const CategorySection = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('https://snacks-back01.onrender.com/api/categories');
+        const res = await fetch('https://snacks-back01-production.up.railway.app/api/categories');
         if (!res.ok) throw new Error('Failed to fetch categories');
         const data = await res.json();
         const apiCategories = (data.data.categories || []).map(cat => {

@@ -4,7 +4,7 @@ const getApiUrl = () => {
   if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL
   }
-  return 'https://snacks-back01.onrender.com/api'
+  return 'https://snacks-back01-production.up.railway.app/api'
 }
 
 const buildApiUrl = (endpoint) => {

@@ -42,12 +42,12 @@ function EditCouponContent() {
 
   useEffect(() => {
     // Fetch categories
-    fetch("https://snacks-back01.onrender.com/api/products/categories")
+    fetch("https://snacks-back01-production.up.railway.app/api/products/categories")
       .then(res => res.json())
       .then(data => setCategories(data.data.categories || []));
     // Fetch coupon details
     if (couponId) {
-      fetch(`https://snacks-back01.onrender.com/api/admin/coupons/${couponId}`, {
+      fetch(`https://snacks-back01-production.up.railway.app/api/admin/coupons/${couponId}`, {
         headers: getAuthHeaders()
       })
         .then(res => res.json())
@@ -113,7 +113,7 @@ function EditCouponContent() {
         validUntil: form.validUntil,
         isActive: form.isActive
       };
-      const res = await fetch(`https://snacks-back01.onrender.com/api/coupons/${couponId}`, {
+      const res = await fetch(`https://snacks-back01-production.up.railway.app/api/coupons/${couponId}`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify(payload)

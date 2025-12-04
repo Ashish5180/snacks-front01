@@ -72,7 +72,7 @@ function ResetPasswordContent() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${'https://snacks-back01.onrender.com/api'}/auth/reset-password`, {
+      const response = await fetch(`${'https://snacks-back01-production.up.railway.app/api'}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

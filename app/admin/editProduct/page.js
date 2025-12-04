@@ -16,7 +16,7 @@ function EditProductContent() {
   const [categories, setCategories] = useState([])
   const [product, setProduct] = useState(null)
   
-  const apiBase = 'https://snacks-back01.onrender.com/api'
+  const apiBase = 'https://snacks-back01-production.up.railway.app/api'
   const getFileUploadHeaders = () => {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return {}

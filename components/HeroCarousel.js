@@ -39,7 +39,7 @@ const HeroCarousel = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('https://snacks-back01.onrender.com/api/admin/banners');
+        const response = await fetch('https://snacks-back01-production.up.railway.app/api/admin/banners');
         const data = await response.json();
         
         if (data.success && data.data && data.data.length > 0) {

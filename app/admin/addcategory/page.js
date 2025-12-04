@@ -23,7 +23,7 @@ const AddCategoryPage = () => {
   const [editValues, setEditValues] = useState({ name: '', description: '', image: '' })
   const [editImageFile, setEditImageFile] = useState(null)
   const [editImagePreview, setEditImagePreview] = useState('')
-  const apiBase = 'https://snacks-back01.onrender.com/api'
+  const apiBase = 'https://snacks-back01-production.up.railway.app/api'
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
