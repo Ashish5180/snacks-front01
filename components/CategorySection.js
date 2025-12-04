@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import SafeImage from './SafeImage'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { buildApiUrl } from '../utils/api'
 
 
 const CategorySection = () => {
@@ -56,14 +57,15 @@ const CategorySection = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch('https://snacks-back01-production.up.railway.app/api/categories');
+        const res = await fetch(buildApiUrl('/categories'));
         if (!res.ok) throw new Error('Failed to fetch categories');
         const data = await res.json();
         const apiCategories = (data.data.categories || []).map(cat => {
           // Handle image URLs - convert relative paths to full URLs
           let image = cat.image || '/images/hero-snack-1.jpg';
           if (image && image.startsWith('/uploads/')) {
-            image = `https://snacks-back01-production.up.railway.app${image}`;
+            // Use relative path for images - backend will serve them through Vercel proxy
+            image = buildApiUrl(image);
           }
           return { ...cat, image };
         });

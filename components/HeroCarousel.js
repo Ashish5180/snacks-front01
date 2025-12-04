@@ -5,6 +5,7 @@ import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import { buildApiUrl } from '../utils/api';
 
 const HeroCarousel = () => {
   const [slides, setSlides] = useState([
@@ -39,7 +40,7 @@ const HeroCarousel = () => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('https://snacks-back01-production.up.railway.app/api/admin/banners');
+        const response = await fetch(buildApiUrl('/admin/banners'));
         const data = await response.json();
         
         if (data.success && data.data && data.data.length > 0) {

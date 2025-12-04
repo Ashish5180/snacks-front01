@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Loader2 } from 'lucide-react'
 import { useToast } from '../../components/Toaster'
+import { buildApiUrl } from '../../utils/api'
 
 const ForgotPasswordPage = () => {
   const router = useRouter()
@@ -24,7 +25,7 @@ const ForgotPasswordPage = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${'https://snacks-back01-production.up.railway.app/api'}/auth/forgot-password`, {
+      const response = await fetch(buildApiUrl('/auth/forgot-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

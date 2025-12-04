@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import { buildApiUrl } from "../../../utils/api";
 
 export default function AddCouponPage() {
   const [categories, setCategories] = useState([]);
@@ -42,7 +43,7 @@ export default function AddCouponPage() {
 
   useEffect(() => {
     // Fetch categories from backend
-    fetch("https://snacks-back01-production.up.railway.app/api/products/categories")
+    fetch(buildApiUrl('/products/categories'))
       .then(res => res.json())
       .then(data => {
         setCategories(data.data.categories || []);
@@ -91,7 +92,7 @@ export default function AddCouponPage() {
         applicableUsers: form.applicableUsers ? form.applicableUsers.split(',').map(u => u.trim()) : [],
         excludedUsers: form.excludedUsers ? form.excludedUsers.split(',').map(u => u.trim()) : []
       };
-      const res = await fetch("https://snacks-back01-production.up.railway.app/api/coupons", {
+      const res = await fetch(buildApiUrl('/coupons'), {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(payload)

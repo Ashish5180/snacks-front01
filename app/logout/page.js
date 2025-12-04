@@ -12,7 +12,7 @@ const LogoutPage = () => {
         if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
           const token = localStorage.getItem('token')
           if (token) {
-            await fetch(`${'https://snacks-back01-production.up.railway.app/api'}/auth/logout`, {
+            await fetch(buildApiUrl('/auth/logout'), {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`,

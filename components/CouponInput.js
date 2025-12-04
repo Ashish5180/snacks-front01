@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
 import { useToast } from './Toaster'
 import { Tag, X } from 'lucide-react'
+import { buildApiUrl } from '../utils/api'
 
 const CouponInput = () => {
   const [couponCode, setCouponCode] = useState('')
@@ -13,7 +14,7 @@ const CouponInput = () => {
 
   useEffect(() => {
     // Fetch public available coupons from backend
-    fetch('https://snacks-back01-production.up.railway.app/api/coupons')
+    fetch(buildApiUrl('/coupons'))
       .then(res => res.json())
       .then(data => {
         if (data.success && data.data && data.data.coupons) {

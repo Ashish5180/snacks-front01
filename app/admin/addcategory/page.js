@@ -23,7 +23,7 @@ const AddCategoryPage = () => {
   const [editValues, setEditValues] = useState({ name: '', description: '', image: '' })
   const [editImageFile, setEditImageFile] = useState(null)
   const [editImagePreview, setEditImagePreview] = useState('')
-  const apiBase = 'https://snacks-back01-production.up.railway.app/api'
+  const apiBase = '/api' // Use relative path to leverage Vercel proxy (avoids CORS)
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {

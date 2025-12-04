@@ -77,7 +77,8 @@ const AdminPage = () => {
   const { addToast } = useToast()
 
   // Memoize API base URL to prevent recreation - MUST be declared before functions that use it
-  const API_BASE_URL = useMemo(() => 'https://snacks-back01-production.up.railway.app/api', [])
+  // Use relative path to leverage Vercel proxy (avoids CORS)
+  const API_BASE_URL = useMemo(() => '/api', [])
 
   // Helper function for fetch with timeout
   const fetchWithTimeout = useCallback(async (url, options = {}, timeout = 30000) => {

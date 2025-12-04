@@ -47,9 +47,12 @@ const LoginPage = () => {
         // Store user data and token immediately
         if (data.data && data.data.user && typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
           localStorage.setItem('user', JSON.stringify(data.data.user))
-          // Store token for authentication
+          // Store token for authentication (ensure it's a string and trim whitespace)
           if (data.token) {
-            localStorage.setItem('token', data.token)
+            const token = typeof data.token === 'string' ? data.token.trim() : String(data.token).trim()
+            if (token) {
+              localStorage.setItem('token', token)
+            }
           }
         }
         

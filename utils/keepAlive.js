@@ -1,5 +1,6 @@
 // Keep backend alive by pinging health endpoint
-const BACKEND_URL = 'https://snacks-back01-production.up.railway.app'
+// Use relative path to leverage Vercel proxy (avoids CORS)
+const BACKEND_URL = typeof window !== 'undefined' ? '' : 'https://snacks-back01-production.up.railway.app'
 const PING_INTERVAL = 5 * 60 * 1000 // 5 minutes
 
 let pingTimer = null
@@ -30,7 +31,8 @@ export const stopBackendKeepAlive = () => {
 const pingBackend = async () => {
   try {
     // Just a simple HEAD request to wake up the backend
-    await fetch(`${BACKEND_URL}/api/products?limit=1`, {
+    const url = typeof window !== 'undefined' ? '/api/products?limit=1' : `${BACKEND_URL}/api/products?limit=1`
+    await fetch(url, {
       method: 'HEAD',
       mode: 'no-cors'
     })

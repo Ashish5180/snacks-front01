@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Lock, Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react'
 import { useToast } from '../../components/Toaster'
+import { buildApiUrl } from '../../utils/api'
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams()
@@ -72,7 +73,7 @@ function ResetPasswordContent() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(`${'https://snacks-back01-production.up.railway.app/api'}/auth/reset-password`, {
+      const response = await fetch(buildApiUrl('/auth/reset-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

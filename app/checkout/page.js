@@ -53,21 +53,25 @@ const CheckoutPage = () => {
 
         const token = localStorage.getItem('token')
         
-        // Check if token exists
-        if (!token) {
+        // Check if token exists and is valid
+        if (!token || typeof token !== 'string' || token.trim() === '') {
           addToast('Please login to continue checkout', 'error')
           router.push('/login?redirect=/checkout')
           setIsCheckingAuth(false)
           return
         }
 
+        // Clean and validate token
+        const cleanToken = token.trim()
+        
         // Verify token validity by calling /api/auth/me
         const response = await fetch(buildApiUrl('/auth/me'), {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'Authorization': `Bearer ${cleanToken}`,
             'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include'
         })
 
         // Handle non-OK responses (including 500 errors)
@@ -76,16 +80,32 @@ const CheckoutPage = () => {
           
           // Try to parse error response if available
           try {
-            const errorData = await response.json().catch(() => null)
+            const errorText = await response.text()
+            let errorData = null
+            
+            // Try to parse as JSON
+            try {
+              errorData = errorText ? JSON.parse(errorText) : null
+            } catch (parseError) {
+              // Not JSON, use text as is
+              console.error('[Auth] Non-JSON error response:', errorText)
+            }
+            
             if (errorData?.message) {
               errorMessage = errorData.message
             } else if (response.status === 500) {
               errorMessage = 'Server error. Please try again later or login again.'
+              console.error('[Auth] 500 Server Error:', {
+                status: response.status,
+                statusText: response.statusText,
+                error: errorData || errorText
+              })
             } else if (response.status === 401) {
               errorMessage = 'Your session has expired. Please login again.'
             }
           } catch (e) {
-            // Response might not be JSON, use default message
+            // Response might not be readable, use default message
+            console.error('[Auth] Error reading response:', e)
             if (response.status === 500) {
               errorMessage = 'Server error. Please try again later or login again.'
             }

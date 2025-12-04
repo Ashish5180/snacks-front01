@@ -16,7 +16,7 @@ function EditProductContent() {
   const [categories, setCategories] = useState([])
   const [product, setProduct] = useState(null)
   
-  const apiBase = 'https://snacks-back01-production.up.railway.app/api'
+  const apiBase = '/api' // Use relative path to leverage Vercel proxy (avoids CORS)
   const getFileUploadHeaders = () => {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return {}

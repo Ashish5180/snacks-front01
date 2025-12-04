@@ -10,6 +10,7 @@ import { useCart } from '../../../context/CartContext'
 import { useWishlist } from '../../../context/WishlistContext'
 import { useToast } from '../../../components/Toaster'
 import { ShoppingCart, ArrowLeft, Star, Heart, Share2, Play, ChevronLeft, ChevronRight, ZoomIn, X } from 'lucide-react'
+import { buildApiUrl } from '../../../utils/api'
 
 export default function ProductDetailPage() {
   const [carouselIdx, setCarouselIdx] = useState(0)
@@ -160,7 +161,7 @@ export default function ProductDetailPage() {
       setError(null)
       
       try {
-        const response = await fetch(`https://snacks-back01-production.up.railway.app/api/products/${params.id}`, {
+        const response = await fetch(buildApiUrl(`/products/${params.id}`), {
           headers: { 'Cache-Control': 'no-cache' }
         })
         
