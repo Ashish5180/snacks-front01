@@ -54,24 +54,38 @@ const Navbar = () => {
       router.push('/login')
       return
     }
+    
     fetch(buildApiUrl('/auth/me'), {
       headers: getAuthHeaders()
     })
-      .then(r => r.json())
+      .then(async (r) => {
+        // Handle non-OK responses
+        if (!r.ok) {
+          // Clear token on auth/server errors
+          if (r.status === 401 || r.status === 500) {
+            localStorage.removeItem('token')
+          }
+          throw new Error('Authentication failed')
+        }
+        return r.json()
+      })
       .then(data => {
         if (data.success) {
-          const role = data.data.role
-            || data.data.user?.role
+          const role = data.data?.role || data.data?.user?.role
           if (role === 'admin') {
             router.push('/admin')
           } else {
             router.push('/profile')
           }
         } else {
+          localStorage.removeItem('token')
           router.push('/login')
         }
       })
-      .catch(() => router.push('/login'))
+      .catch(() => {
+        localStorage.removeItem('token')
+        router.push('/login')
+      })
   }
 
   const handleWishlistClick = () => {

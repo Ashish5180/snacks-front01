@@ -76,7 +76,14 @@ const CreateProductPage = () => {
 
         const res = await fetch(`${apiBase}/auth/me`, { headers: getAuthHeaders() })
         if (!res.ok) {
-          // Token might be expired, clear it and redirect to login
+          // Handle different error statuses
+          if (res.status === 500) {
+            addToast('Server error. Please try again later.', 'error')
+          } else if (res.status === 401) {
+            addToast('Your session has expired. Please login again.', 'error')
+          }
+          
+          // Clear token and redirect to login
           if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
             localStorage.removeItem('token')
             localStorage.removeItem('user')

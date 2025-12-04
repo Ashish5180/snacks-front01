@@ -70,9 +70,38 @@ const CheckoutPage = () => {
           }
         })
 
+        // Handle non-OK responses (including 500 errors)
+        if (!response.ok) {
+          let errorMessage = 'Authentication failed. Please login again.'
+          
+          // Try to parse error response if available
+          try {
+            const errorData = await response.json().catch(() => null)
+            if (errorData?.message) {
+              errorMessage = errorData.message
+            } else if (response.status === 500) {
+              errorMessage = 'Server error. Please try again later or login again.'
+            } else if (response.status === 401) {
+              errorMessage = 'Your session has expired. Please login again.'
+            }
+          } catch (e) {
+            // Response might not be JSON, use default message
+            if (response.status === 500) {
+              errorMessage = 'Server error. Please try again later or login again.'
+            }
+          }
+          
+          localStorage.removeItem('token')
+          addToast(errorMessage, 'error')
+          router.push('/login?redirect=/checkout')
+          setIsCheckingAuth(false)
+          return
+        }
+
+        // Parse successful response
         const data = await response.json()
 
-        if (!response.ok || !data.success) {
+        if (!data.success) {
           // Token is invalid or expired
           localStorage.removeItem('token')
           addToast('Your session has expired. Please login again.', 'error')
